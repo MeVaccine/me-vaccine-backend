@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
+import { UserModule } from './user/user.module';
 
 @Module({
 	imports: [
@@ -18,6 +19,7 @@ import { AppService } from './app.service'
 			useNewUrlParser: true,
 			useUnifiedTopology: true,
 		}),
+		UserModule,
 	],
 	controllers: [AppController],
 	providers: [AppService],
