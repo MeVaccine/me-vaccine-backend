@@ -7,5 +7,7 @@ import { Repository } from 'typeorm'
 export class UserService {
 	constructor(@InjectRepository(User) private usersRepository: Repository<User>) {}
 
-	async createUser() {}
+	// async createUser() {
+	// 	const user = this.usersRepository.create({})
+	// }
 }
