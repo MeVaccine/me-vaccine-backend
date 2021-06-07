@@ -50,6 +50,9 @@ export class User {
 	@Column()
 	@ApiProperty()
 	phoneNumber: string
+	@Column({ default: false })
+	@ApiProperty()
+	isPhoneVerify: boolean
 	@Column(type => Location)
 	@ApiProperty()
 	preferedLocation

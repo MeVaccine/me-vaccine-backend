@@ -25,6 +25,7 @@ export class UserService {
 			gender_th: genderTH,
 			phoneNumber,
 			preferedLocation,
+			isPhoneVerify: false,
 		})
 		return this.usersRepository.save(user)
 	}

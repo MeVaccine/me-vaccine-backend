@@ -27,14 +27,15 @@ export class UserController {
 	@ApiOperation({ summary: 'Register new user' })
 	@ApiResponse({ status: 201, description: 'The User information', type: User })
 	@ApiResponse({ status: 400 })
+	@ApiResponse({ status: 404, description: 'LaserID and/or natioalID is/are in wrong format' })
 	async registerNewUser(@Body() regisNewUserDto: RegisNewUserDto) {
 		const personData = await this.apiService.searchByNationalID(regisNewUserDto.nationalID, regisNewUserDto.laserID)
 		const existingUser = await this.userService.findByNationalID(regisNewUserDto.nationalID)
-		if (existingUser) {
-			throw new BadRequestException('User already register')
-		}
+		if (existingUser) throw new BadRequestException('User already register')
+
 		const preferedLocation = await this.locationService.findById(regisNewUserDto.preferedLocation)
 		if (!preferedLocation) throw new NotFoundException('Prefered location is not found')
+
 		return this.userService.createUser(personData, regisNewUserDto.phoneNumber, preferedLocation)
 	}
 }
