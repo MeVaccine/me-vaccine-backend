@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
-import { Location } from 'src/schema/Location.schema'
-import { MongoRepository } from 'typeorm'
+import { InjectModel } from '@nestjs/mongoose'
+import { Model } from 'mongoose'
+import { Location, LocationDocument } from 'src/schema/Location.schema'
 
 @Injectable()
 export class LocationService {
-	constructor(@InjectRepository(Location) private locationRepository: MongoRepository<Location>) {}
+	constructor(@InjectModel(Location.name) private locationModel: Model<LocationDocument>) {}
 
-	async findById(locationId: string) {
-		return this.locationRepository.findOne(locationId)
+	findById(locationId: string) {
+		return this.locationModel.findOne({ id: locationId }).exec()
 	}
 }
