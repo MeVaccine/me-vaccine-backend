@@ -9,7 +9,7 @@ export class OTPService {
 	private nanoIdRef
 	constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache, private configService: ConfigService) {
 		this.nanoIdOTP = customAlphabet('0123456789', 6)
-		this.nanoIdRef = customAlphabet('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ', 6)
+		this.nanoIdRef = customAlphabet('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ', 4)
 	}
 
 	private async sendOTP(phoneNumber: string, otpCode: string, refCode: string) {
@@ -28,12 +28,15 @@ export class OTPService {
 		})
 	}
 
-	async generatedAndSentOTP(id: string, phoneNumber: string) {
+	async generatedAndSentOTP(id: string, phoneNumber: string): Promise<string> {
 		const refCode = this.nanoIdRef()
 		const otpCode = this.nanoIdOTP()
 
-		await this.cacheManager.set(otpCode, id, { ttl: 300 })
-		return this.sendOTP(phoneNumber, otpCode, refCode)
+		await Promise.all([
+			this.sendOTP(phoneNumber, otpCode, refCode),
+			this.cacheManager.set(otpCode, id, { ttl: 300 }),
+		])
+		return refCode
 	}
 
 	async getIdFromOTP(otpCode: string) {

@@ -1,5 +1,5 @@
 import { NotFoundException, PipeTransform } from '@nestjs/common'
-import { Location } from 'src/entity/Location.entity'
+import { Location } from 'src/schema/Location.schema'
 import { LocationService } from './location.service'
 
 export class LocationValidationPipe implements PipeTransform<string, Promise<Location>> {
