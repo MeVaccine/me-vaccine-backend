@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
-import { ObjectId } from 'mongodb'
 import { Model } from 'mongoose'
 import { Location, LocationDocument } from 'src/schema/Location.schema'
 

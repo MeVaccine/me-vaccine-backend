@@ -27,7 +27,6 @@
     "@nestjs/mongoose": "^7.2.4",
     "@nestjs/platform-express": "^7.5.1",
     "@nestjs/swagger": "^4.8.0",
-    "@nestjs/typeorm": "^7.1.5",
     "cache-manager": "^3.4.3",
     "class-transformer": "^0.4.0",
     "class-validator": "^0.13.1",
@@ -38,8 +37,7 @@
     "rimraf": "^3.0.2",
     "rxjs": "^6.6.3",
     "swagger-ui-express": "^4.1.6",
-    "twilio": "^3.63.1",
-    "typeorm": "^0.2.34"
+    "twilio": "^3.63.1"
   },
   "devDependencies": {
     "@nestjs/cli": "^7.5.1",
