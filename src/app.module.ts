@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common'
-import { ConfigModule } from '@nestjs/config'
+import { ConfigModule, ConfigService } from '@nestjs/config'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import { UserModule } from './user/user.module'
@@ -15,9 +15,13 @@ import { APP_GUARD } from '@nestjs/core'
 			isGlobal: true,
 			envFilePath: '.env',
 		}),
-		MongooseModule.forRoot(process.env.MONGODB_CONNECTION_URL, {
-			useNewUrlParser: true,
-			useUnifiedTopology: true,
+		MongooseModule.forRootAsync({
+			inject: [ConfigService],
+			useFactory: async (configService: ConfigService) => ({
+				uri: configService.get<string>('MONGODB_CONNECTION_URL'),
+				useNewUrlParser: true,
+				useUnifiedTopology: true,
+			}),
 		}),
 		ThrottlerModule.forRoot({
 			ttl: 5,
