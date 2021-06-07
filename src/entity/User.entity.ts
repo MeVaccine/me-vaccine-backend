@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { Column, Entity, ObjectID, ObjectIdColumn } from 'typeorm'
-import { Hospital } from './Hospital.entity'
+import { Location } from './Location.entity'
 
 export enum GenderEN {
 	MALE = 'Male',
@@ -50,7 +50,7 @@ export class User {
 	@Column()
 	@ApiProperty()
 	phoneNumber: string
-	@Column(type => Hospital)
+	@Column(type => Location)
 	@ApiProperty()
 	preferedHospital
 }
