@@ -1,5 +1,6 @@
 export interface NationalIDQueryDto {
 	id: string
+	laserID: string
 	en: UserData
 	th: UserData
 }

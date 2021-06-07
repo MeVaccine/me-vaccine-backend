@@ -16,6 +16,6 @@ export class UserController {
 	@Post('regis')
 	async registerNewUser(@Body() regisNewUserDto: RegisNewUserDto) {
 		const personData = await this.apiService.searchByNationalID(regisNewUserDto.nationalID, regisNewUserDto.laserID)
-		return personData
+		return this.userService.createUser(personData)
 	}
 }

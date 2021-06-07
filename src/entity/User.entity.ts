@@ -5,6 +5,11 @@ export enum GenderEN {
 	Female = 'Female',
 }
 
+export enum GenderTH {
+	MALE = 'ชาย',
+	Female = 'หญิง',
+}
+
 @Entity({ name: 'users' })
 export class User {
 	@ObjectIdColumn()
@@ -18,8 +23,8 @@ export class User {
 	firstname_th: string
 	@Column()
 	lastname_th: string
-	@Column()
-	gender_th: string
+	@Column({ type: 'enum', enum: GenderTH })
+	gender_th: GenderTH
 	@Column()
 	prefix_en: string
 	@Column()
