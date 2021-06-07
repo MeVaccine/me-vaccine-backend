@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger'
 import { Column, Entity, ObjectID, ObjectIdColumn } from 'typeorm'
 
 export enum GenderEN {
@@ -16,25 +17,36 @@ export class User {
 	id: ObjectID
 
 	@Column({ length: 13 })
+	@ApiProperty()
 	nationalID: string
 	@Column()
+	@ApiProperty()
 	prefix_th: string
 	@Column()
+	@ApiProperty()
 	firstname_th: string
 	@Column()
+	@ApiProperty()
 	lastname_th: string
 	@Column({ type: 'enum', enum: GenderTH })
+	@ApiProperty()
 	gender_th: GenderTH
 	@Column()
+	@ApiProperty()
 	prefix_en: string
 	@Column()
+	@ApiProperty()
 	firstname_en: string
 	@Column()
+	@ApiProperty()
 	lastname_en: string
 	@Column({ type: 'enum', enum: GenderEN })
+	@ApiProperty()
 	gender_en: GenderEN
 	@Column()
+	@ApiProperty()
 	dateOfBirth: Date
 	@Column()
+	@ApiProperty()
 	phoneNumber: string
 }
