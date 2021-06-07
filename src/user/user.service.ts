@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { NationalIDQueryDto } from 'src/api/dto/national-id-query.dto'
 import { Location } from 'src/entity/Location.entity'
 import { GenderEN, GenderTH, User } from 'src/entity/User.entity'
-import { MongoRepository } from 'typeorm'
+import { MongoRepository, ObjectID } from 'typeorm'
 
 @Injectable()
 export class UserService {
@@ -28,6 +28,17 @@ export class UserService {
 			isPhoneVerify: false,
 		})
 		return this.usersRepository.save(user)
+	}
+
+	updatePhoneNumberAndLocation(id: ObjectID, newPhoneNumber: string, newLocation: Location) {
+		return this.usersRepository.updateOne(
+			id,
+			$set: {
+				phoneNumber: newPhoneNumber,
+				preferedLocation: newLocation,
+			},
+			{ upsert: true }
+		)
 	}
 
 	findByNationalID(nationalID: string): Promise<User> {

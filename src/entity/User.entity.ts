@@ -55,5 +55,5 @@ export class User {
 	isPhoneVerify: boolean
 	@Column(type => Location)
 	@ApiProperty()
-	preferedLocation
+	preferedLocation: Location
 }

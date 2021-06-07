@@ -1,6 +1,7 @@
 import { BadRequestException, Body, Controller, Get, NotFoundException, Post, Query } from '@nestjs/common'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { ApiService } from 'src/api/api.service'
+import { OTPService } from 'src/api/otp.service'
 import { User } from 'src/entity/User.entity'
 import { LocationService } from 'src/location/location.service'
 import { RegisNewUserDto } from './dto/regis-new-user.dto'
@@ -12,7 +13,8 @@ export class UserController {
 	constructor(
 		private userService: UserService,
 		private apiService: ApiService,
-		private locationService: LocationService
+		private locationService: LocationService,
+		private otpService: OTPService
 	) {}
 
 	@Get('/nationalInfo')
@@ -31,11 +33,25 @@ export class UserController {
 	async registerNewUser(@Body() regisNewUserDto: RegisNewUserDto) {
 		const personData = await this.apiService.searchByNationalID(regisNewUserDto.nationalID, regisNewUserDto.laserID)
 		const existingUser = await this.userService.findByNationalID(regisNewUserDto.nationalID)
-		if (existingUser) throw new BadRequestException('User already register')
+		if (existingUser && existingUser.isPhoneVerify) throw new BadRequestException('User already register')
 
 		const preferedLocation = await this.locationService.findById(regisNewUserDto.preferedLocation)
 		if (!preferedLocation) throw new NotFoundException('Prefered location is not found')
 
-		return this.userService.createUser(personData, regisNewUserDto.phoneNumber, preferedLocation)
+		let newUser: User
+		if (!existingUser) {
+			newUser = await this.userService.createUser(personData, regisNewUserDto.phoneNumber, preferedLocation)
+		} else {
+			await this.userService.updatePhoneNumberAndLocation(
+				existingUser.id,
+				regisNewUserDto.phoneNumber,
+				preferedLocation
+			)
+			await this.otpService.generatedAndSentOTP(existingUser.id.toString(), regisNewUserDto.phoneNumber)
+		}
+		// await this.otpService.generatedAndSentOTP(
+		// 	existingUser ? existingUser.id.toString() : newUser.id.toString(),
+		// 	regisNewUserDto.phoneNumber
+		// )
 	}
 }
