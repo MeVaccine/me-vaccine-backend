@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { NationalIDQueryDto } from 'src/api/dto/national-id-query.dto'
-import { Location } from 'src/entity/Location.entity'
-import { GenderEN, GenderTH, User } from 'src/entity/User.entity'
+import { Location } from 'src/schema/Location.schema'
+import { GenderEN, GenderTH, User } from 'src/schema/User.schema'
 import { MongoRepository, ObjectID } from 'typeorm'
 
 @Injectable()

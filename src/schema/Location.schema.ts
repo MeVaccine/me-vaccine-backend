@@ -1,61 +1,65 @@
+import { Schema, Prop } from '@nestjs/mongoose'
 import { ApiProperty } from '@nestjs/swagger'
-import { Column, Entity, ObjectID, ObjectIdColumn } from 'typeorm'
 
-@Entity({ name: 'locations' })
+@Schema()
 export class Location {
-	@ObjectIdColumn()
-	id: ObjectID
-
-	@Column()
+	@Prop()
 	@ApiProperty()
 	name_th: string
-	@Column()
+
+	@Prop()
 	@ApiProperty()
 	name_en: string
-	@Column()
+
+	@Prop()
 	@ApiProperty()
 	priority: number
-	@Column()
+
+	@Prop()
 	@ApiProperty()
 	province_th: string
-	@Column()
+
+	@Prop()
 	@ApiProperty()
 	province_en: string
 
-	@Column(type => Vaccine)
+	@Prop()
 	@ApiProperty()
 	vaccines: Vaccine[]
 
-	@Column(type => DateTime)
+	@Prop()
 	@ApiProperty()
 	dateTime: DateTime[]
 }
 
 export class Vaccine {
-	@Column()
+	@Prop()
 	@ApiProperty()
 	name: string
 
-	@Column()
+	@Prop()
 	@ApiProperty()
 	amount: number
 
-	@Column()
+	@Prop()
 	@ApiProperty()
 	avaliable: number
 }
 
 export class DateTime {
-	@Column()
+	@Prop()
 	@ApiProperty()
 	startDateTime: Date
-	@Column()
+
+	@Prop()
 	@ApiProperty()
 	endDateTime: Date
-	@Column()
+
+	@Prop()
 	@ApiProperty()
 	capacity: number
-	@Column()
+
+	@Prop()
 	@ApiProperty()
 	avaliable: number
 }

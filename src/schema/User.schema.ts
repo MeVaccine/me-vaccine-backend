@@ -1,6 +1,6 @@
+import { Prop, Schema } from '@nestjs/mongoose'
 import { ApiProperty } from '@nestjs/swagger'
-import { Column, Entity, ObjectID, ObjectIdColumn } from 'typeorm'
-import { Location } from './Location.entity'
+import { Location } from './Location.schema'
 
 export enum GenderEN {
 	MALE = 'Male',
@@ -12,48 +12,57 @@ export enum GenderTH {
 	Female = 'หญิง',
 }
 
-@Entity({ name: 'users' })
+@Schema()
 export class User {
-	@ObjectIdColumn()
-	id: ObjectID
-
-	@Column({ length: 13 })
+	@Prop({ length: 13, required: true })
 	@ApiProperty()
 	nationalID: string
-	@Column()
+
+	@Prop({ required: true })
 	@ApiProperty()
 	prefix_th: string
-	@Column()
+
+	@Prop({ required: true })
 	@ApiProperty()
 	firstname_th: string
-	@Column()
+
+	@Prop({ required: true })
 	@ApiProperty()
 	lastname_th: string
-	@Column({ type: 'enum', enum: GenderTH })
+
+	@Prop({ enum: ['ชาย', 'หญิง'] })
 	@ApiProperty()
 	gender_th: GenderTH
-	@Column()
+
+	@Prop({ required: true })
 	@ApiProperty()
 	prefix_en: string
-	@Column()
+
+	@Prop({ required: true })
 	@ApiProperty()
 	firstname_en: string
-	@Column()
+
+	@Prop({ required: true })
 	@ApiProperty()
 	lastname_en: string
-	@Column({ type: 'enum', enum: GenderEN })
+
+	@Prop({ enum: ['Male', 'Female'] })
 	@ApiProperty()
 	gender_en: GenderEN
-	@Column()
+
+	@Prop({ required: true })
 	@ApiProperty()
 	dateOfBirth: Date
-	@Column()
+
+	@Prop({ required: true })
 	@ApiProperty()
 	phoneNumber: string
-	@Column({ default: false })
+
+	@Prop({ default: false })
 	@ApiProperty()
 	isPhoneVerify: boolean
-	@Column(type => Location)
+
+	@Prop()
 	@ApiProperty()
 	preferedLocation: Location
 }

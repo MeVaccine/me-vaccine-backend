@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
-import { Location } from 'src/entity/Location.entity'
+import { Location } from 'src/schema/Location.schema'
 import { LocationService } from './location.service'
 
 @Module({

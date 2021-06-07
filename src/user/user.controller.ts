@@ -2,7 +2,7 @@ import { BadRequestException, Body, Controller, Get, NotFoundException, Post, Qu
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { ApiService } from 'src/api/api.service'
 import { OTPService } from 'src/api/otp.service'
-import { User } from 'src/entity/User.entity'
+import { User } from 'src/schema/User.schema'
 import { LocationService } from 'src/location/location.service'
 import { RegisNewUserDto } from './dto/regis-new-user.dto'
 import { UserService } from './user.service'
