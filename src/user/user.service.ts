@@ -1,17 +1,18 @@
 import { Injectable } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
+import { InjectModel } from '@nestjs/mongoose'
+import { Model } from 'mongoose'
 import { NationalIDQueryDto } from 'src/api/dto/national-id-query.dto'
-import { GenderEN, GenderTH, User } from 'src/entity/User.entity'
-import { Repository } from 'typeorm'
+import { Location } from 'src/schema/Location.schema'
+import { GenderEN, GenderTH, User, UserDocument } from 'src/schema/User.schema'
 
 @Injectable()
 export class UserService {
-	constructor(@InjectRepository(User) private usersRepository: Repository<User>) {}
+	constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
-	createUser(personData: NationalIDQueryDto, phoneNumber: string): Promise<User> {
+	createUser(personData: NationalIDQueryDto, phoneNumber: string, preferedLocation: Location) {
 		const genderEN = GenderEN.Female == personData.en.gender ? GenderEN.Female : GenderEN.MALE
 		const genderTH = GenderTH.Female == personData.th.gender ? GenderTH.Female : GenderTH.MALE
-		const user = this.usersRepository.create({
+		const user = new this.userModel({
 			nationalID: personData.id,
 			dateOfBirth: personData.en.date_of_birth,
 			prefix_en: personData.en.prefix,
@@ -23,11 +24,13 @@ export class UserService {
 			lastname_th: personData.th.lastname,
 			gender_th: genderTH,
 			phoneNumber,
+			preferedLocation,
+			isPhoneVerify: false,
 		})
-		return this.usersRepository.save(user)
+		return user.save()
 	}
 
-	findByNationalID(nationalID: string): Promise<User> {
-		return this.usersRepository.findOne({ where: { nationalID } })
+	findByNationalID(nationalID: string) {
+		return this.userModel.findOne({ nationalID }).exec()
 	}
 }
