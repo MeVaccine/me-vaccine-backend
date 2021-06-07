@@ -33,4 +33,8 @@ export class UserService {
 	findByNationalID(nationalID: string) {
 		return this.userModel.findOne({ nationalID }).exec()
 	}
+
+	findByNationalIdAndPhone(nationalID: string, phoneNumber: string) {
+		return this.userModel.findOne({ nationalID, phoneNumber, isPhoneVerify: true }).exec()
+	}
 }

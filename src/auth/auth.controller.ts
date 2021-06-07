@@ -1,12 +1,22 @@
 import { UserService } from 'src/user/user.service'
-import { BadRequestException, Body, Controller, NotFoundException, Post } from '@nestjs/common'
-import { ApiBadRequestResponse, ApiNotFoundResponse, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { BadRequestException, Body, Controller, Get, NotFoundException, Post, Query } from '@nestjs/common'
+import {
+	ApiBadRequestResponse,
+	ApiCreatedResponse,
+	ApiNotFoundResponse,
+	ApiOkResponse,
+	ApiOperation,
+	ApiResponse,
+	ApiTags,
+} from '@nestjs/swagger'
 import { RegisNewUserDto } from './dto/regis-new-user.dto'
-import { RegisNewUserResponseDo } from './dto/regis-new-user-res.dto'
+import { RefCodeResponse } from './dto/refcode-res.dto'
 import { ApiService } from 'src/api/api.service'
 import { UserDocument } from 'src/schema/User.schema'
 import { OTPService } from 'src/api/otp.service'
 import { LocationService } from 'src/location/location.service'
+import { RequestOTPLoginDto } from './dto/login-request-otp.dto'
+import { VerifySuccessResponse } from './dto/verify-success-res.dto'
 
 @Controller('auth')
 @ApiTags('Authentication')
@@ -20,7 +30,7 @@ export class AuthController {
 
 	@Post('regis')
 	@ApiOperation({ summary: 'Register new user' })
-	@ApiResponse({ status: 201, type: RegisNewUserResponseDo })
+	@ApiResponse({ status: 201, type: RefCodeResponse })
 	@ApiBadRequestResponse({ description: 'LaserID and/or natioalID is/are in wrong format' })
 	@ApiNotFoundResponse({ description: 'Not found in national external API' })
 	async registerNewUser(@Body() { laserID, nationalID, phoneNumber, preferedLocation }: RegisNewUserDto) {
@@ -39,7 +49,34 @@ export class AuthController {
 			existingUser.preferedLocation = preferedLocationDoc
 			user = await existingUser.save()
 		}
-		// const refCode = await this.otpService.generatedAndSentOTP(user.id, phoneNumber)
-		// return { refCode }
+		const refCode = await this.otpService.generatedAndSentOTP(user.id, phoneNumber)
+		return { refCode }
+	}
+
+	@Post('login')
+	@ApiOperation({ summary: 'Request OTP for user loging in using national ID and phone number' })
+	@ApiCreatedResponse({ type: RefCodeResponse })
+	@ApiBadRequestResponse({
+		description: 'National ID and/or phoneNumber is not correct or user have not register yet',
+	})
+	async requestOTPForLogin(@Body() { nationalID, phoneNumber }: RequestOTPLoginDto) {
+		const user = await this.userService.findByNationalIdAndPhone(nationalID, phoneNumber)
+		if (!user) throw new BadRequestException()
+
+		const refCode = await this.otpService.generatedAndSentOTP(user.id, phoneNumber)
+		return { refCode }
+	}
+
+	@Get('verify')
+	@ApiOperation({ summary: 'Get the OTP code and return JWT token' })
+	@ApiOkResponse({ type: VerifySuccessResponse })
+	@ApiBadRequestResponse({
+		description: 'OTP is not correct or expired',
+	})
+	async verifyOTPCode(@Query('otp') otpCode: string) {
+		const userId = await this.otpService.getIdFromOTP(otpCode)
+		if (!userId) throw new BadRequestException('OTP is not correct or expired')
+
+		// Generate JWT and send it back
 	}
 }
