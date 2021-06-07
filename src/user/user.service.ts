@@ -8,7 +8,7 @@ import { Repository } from 'typeorm'
 export class UserService {
 	constructor(@InjectRepository(User) private usersRepository: Repository<User>) {}
 
-	createUser(personData: NationalIDQueryDto): Promise<User> {
+	createUser(personData: NationalIDQueryDto, phoneNumber: string): Promise<User> {
 		const genderEN = GenderEN.Female == personData.en.gender ? GenderEN.Female : GenderEN.MALE
 		const genderTH = GenderTH.Female == personData.th.gender ? GenderTH.Female : GenderTH.MALE
 		const user = this.usersRepository.create({
@@ -22,18 +22,9 @@ export class UserService {
 			firstname_th: personData.th.firstname,
 			lastname_th: personData.th.lastname,
 			gender_th: genderTH,
+			phoneNumber,
 		})
 		return this.usersRepository.save(user)
-	}
-
-	async existingUserWithNoPhone(nationalID: string): Promise<User> {
-		const user = await this.usersRepository.findOne({
-			where: {
-				nationalID,
-				phoneNumber: null,
-			},
-		})
-		return user
 	}
 
 	findByNationalID(nationalID: string): Promise<User> {
