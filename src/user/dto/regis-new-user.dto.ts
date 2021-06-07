@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsPhoneNumber, Length, Matches } from 'class-validator'
+import { IsMongoId, IsNotEmpty, IsPhoneNumber, Length } from 'class-validator'
 
 export class RegisNewUserDto {
 	@ApiProperty()
@@ -11,4 +11,7 @@ export class RegisNewUserDto {
 	@ApiProperty()
 	@IsPhoneNumber('TH')
 	phoneNumber: string
+	@ApiProperty()
+	@IsMongoId()
+	preferedLocation: string
 }

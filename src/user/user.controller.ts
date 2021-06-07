@@ -1,14 +1,19 @@
-import { BadRequestException, Body, Controller, Get, Post, Query } from '@nestjs/common'
+import { BadRequestException, Body, Controller, Get, NotFoundException, Post, Query } from '@nestjs/common'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { ApiService } from 'src/api/api.service'
 import { User } from 'src/entity/User.entity'
+import { LocationService } from 'src/location/location.service'
 import { RegisNewUserDto } from './dto/regis-new-user.dto'
 import { UserService } from './user.service'
 
 @Controller('user')
 @ApiTags('User')
 export class UserController {
-	constructor(private userService: UserService, private apiService: ApiService) {}
+	constructor(
+		private userService: UserService,
+		private apiService: ApiService,
+		private locationService: LocationService
+	) {}
 
 	@Get('/nationalInfo')
 	@ApiOperation({ summary: 'Get user info from external national API' })
@@ -28,6 +33,8 @@ export class UserController {
 		if (existingUser) {
 			throw new BadRequestException('User already register')
 		}
-		return this.userService.createUser(personData, regisNewUserDto.phoneNumber)
+		const preferedLocation = await this.locationService.findById(regisNewUserDto.preferedLocation)
+		if (!preferedLocation) throw new NotFoundException('Prefered location is not found')
+		return this.userService.createUser(personData, regisNewUserDto.phoneNumber, preferedLocation)
 	}
 }

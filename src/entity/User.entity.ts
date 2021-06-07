@@ -52,5 +52,5 @@ export class User {
 	phoneNumber: string
 	@Column(type => Location)
 	@ApiProperty()
-	preferedHospital
+	preferedLocation
 }

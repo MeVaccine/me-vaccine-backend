@@ -1,14 +1,15 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { NationalIDQueryDto } from 'src/api/dto/national-id-query.dto'
+import { Location } from 'src/entity/Location.entity'
 import { GenderEN, GenderTH, User } from 'src/entity/User.entity'
-import { Repository } from 'typeorm'
+import { MongoRepository } from 'typeorm'
 
 @Injectable()
 export class UserService {
-	constructor(@InjectRepository(User) private usersRepository: Repository<User>) {}
+	constructor(@InjectRepository(User) private usersRepository: MongoRepository<User>) {}
 
-	createUser(personData: NationalIDQueryDto, phoneNumber: string): Promise<User> {
+	createUser(personData: NationalIDQueryDto, phoneNumber: string, preferedLocation: Location): Promise<User> {
 		const genderEN = GenderEN.Female == personData.en.gender ? GenderEN.Female : GenderEN.MALE
 		const genderTH = GenderTH.Female == personData.th.gender ? GenderTH.Female : GenderTH.MALE
 		const user = this.usersRepository.create({
@@ -23,6 +24,7 @@ export class UserService {
 			lastname_th: personData.th.lastname,
 			gender_th: genderTH,
 			phoneNumber,
+			preferedLocation,
 		})
 		return this.usersRepository.save(user)
 	}
