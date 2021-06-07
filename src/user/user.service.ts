@@ -9,7 +9,7 @@ import { GenderEN, GenderTH, User, UserDocument } from 'src/schema/User.schema'
 export class UserService {
 	constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
-	createUser(personData: NationalIDQueryDto, phoneNumber: string, preferedLocation: Location): Promise<User> {
+	createUser(personData: NationalIDQueryDto, phoneNumber: string, preferedLocation: Location) {
 		const genderEN = GenderEN.Female == personData.en.gender ? GenderEN.Female : GenderEN.MALE
 		const genderTH = GenderTH.Female == personData.th.gender ? GenderTH.Female : GenderTH.MALE
 		const user = new this.userModel({
@@ -29,17 +29,6 @@ export class UserService {
 		})
 		return user.save()
 	}
-
-	// updatePhoneNumberAndLocation(id: ObjectID, newPhoneNumber: string, newLocation: Location) {
-	// 	return this.usersRepository.updateOne(
-	// 		id,
-	// 		$set: {
-	// 			phoneNumber: newPhoneNumber,
-	// 			preferedLocation: newLocation,
-	// 		},
-	// 		{ upsert: true }
-	// 	)
-	// }
 
 	findByNationalID(nationalID: string) {
 		return this.userModel.findOne({ nationalID }).exec()

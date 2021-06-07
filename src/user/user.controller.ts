@@ -2,7 +2,7 @@ import { BadRequestException, Body, Controller, Get, NotFoundException, Post, Qu
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { ApiService } from 'src/api/api.service'
 import { OTPService } from 'src/api/otp.service'
-import { User } from 'src/schema/User.schema'
+import { User, UserDocument } from 'src/schema/User.schema'
 import { LocationService } from 'src/location/location.service'
 import { RegisNewUserDto } from './dto/regis-new-user.dto'
 import { UserService } from './user.service'
@@ -30,28 +30,22 @@ export class UserController {
 	@ApiResponse({ status: 201, description: 'The User information', type: User })
 	@ApiResponse({ status: 400 })
 	@ApiResponse({ status: 404, description: 'LaserID and/or natioalID is/are in wrong format' })
-	async registerNewUser(@Body() regisNewUserDto: RegisNewUserDto) {
-		const personData = await this.apiService.searchByNationalID(regisNewUserDto.nationalID, regisNewUserDto.laserID)
-		const existingUser = await this.userService.findByNationalID(regisNewUserDto.nationalID)
+	async registerNewUser(@Body() { laserID, nationalID, phoneNumber, preferedLocation }: RegisNewUserDto) {
+		const personData = await this.apiService.searchByNationalID(nationalID, laserID)
+		const existingUser = await this.userService.findByNationalID(nationalID)
 		if (existingUser && existingUser.isPhoneVerify) throw new BadRequestException('User already register')
 
-		const preferedLocation = await this.locationService.findById(regisNewUserDto.preferedLocation)
+		const preferedLocationDoc = await this.locationService.findById(preferedLocation)
 		if (!preferedLocation) throw new NotFoundException('Prefered location is not found')
 
-		let newUser: User
+		let user: UserDocument
 		if (!existingUser) {
-			newUser = await this.userService.createUser(personData, regisNewUserDto.phoneNumber, preferedLocation)
+			user = await this.userService.createUser(personData, phoneNumber, preferedLocationDoc)
 		} else {
-			// await this.userService.updatePhoneNumberAndLocation(
-			// 	existingUser.id,
-			// 	regisNewUserDto.phoneNumber,
-			// 	preferedLocation
-			// )
-			// await this.otpService.generatedAndSentOTP(existingUser.id.toString(), regisNewUserDto.phoneNumber)
+			existingUser.phoneNumber = phoneNumber
+			existingUser.preferedLocation = preferedLocationDoc
+			user = await existingUser.save()
 		}
-		// await this.otpService.generatedAndSentOTP(
-		// 	existingUser ? existingUser.id.toString() : newUser.id.toString(),
-		// 	regisNewUserDto.phoneNumber
-		// )
+		await this.otpService.generatedAndSentOTP(user.id, phoneNumber)
 	}
 }
