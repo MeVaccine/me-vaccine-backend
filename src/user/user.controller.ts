@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common'
+import { BadRequestException, Body, Controller, Post } from '@nestjs/common'
 import { ApiService } from 'src/api/api.service'
 import { RegisNewUserDto } from './dto/regis-new-user.dto'
 import { RegisUserPhoneDto } from './dto/regis-user-phone.dto'
@@ -16,6 +16,10 @@ export class UserController {
 	@Post('regis')
 	async registerNewUser(@Body() regisNewUserDto: RegisNewUserDto) {
 		const personData = await this.apiService.searchByNationalID(regisNewUserDto.nationalID, regisNewUserDto.laserID)
+		const existingUser = await this.userService.existingUserWithNoPhone(regisNewUserDto.nationalID)
+		if (existingUser) {
+			return existingUser
+		}
 		return this.userService.createUser(personData)
 	}
 }

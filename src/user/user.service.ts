@@ -25,4 +25,18 @@ export class UserService {
 		})
 		return this.usersRepository.save(user)
 	}
+
+	async existingUserWithNoPhone(nationalID: string): Promise<User> {
+		const user = await this.usersRepository.findOne({
+			where: {
+				nationalID,
+				phoneNumber: null,
+			},
+		})
+		return user
+	}
+
+	findByNationalID(nationalID: string): Promise<User> {
+		return this.usersRepository.findOne({ where: { nationalID } })
+	}
 }

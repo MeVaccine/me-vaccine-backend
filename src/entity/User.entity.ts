@@ -35,4 +35,6 @@ export class User {
 	gender_en: GenderEN
 	@Column()
 	dateOfBirth: Date
+	@Column()
+	phoneNumber: string
 }
