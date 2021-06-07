@@ -31,20 +31,4 @@ export class ApiService {
 			throw new InternalServerErrorException()
 		}
 	}
-
-	async sendOTP(phoneNumber: string, otpCode: string, refCode: string) {
-		const accountSid = this.configService.get<string>('TWILIO_ACCOUNT_SID')
-		const authToken = this.configService.get<string>('TWILIO_AUTH_TOKEN')
-		const fromNumber = this.configService.get<string>('TWILIO_FROM_NUMBER')
-		// eslint-disable-next-line @typescript-eslint/no-var-requires
-		const client = require('twilio')(accountSid, authToken)
-
-		const message = `รหัส OTP ของคุณคือ ${otpCode} รหัสอ้างอิง ${refCode} ห้ามบอกรหัสนี้แก่ผู้อื่น\nYour OTP code is ${otpCode}, Ref ${refCode} Please do not share this code to others`
-
-		return client.messages.create({
-			body: message,
-			from: fromNumber,
-			to: `+66${phoneNumber}`,
-		})
-	}
 }
