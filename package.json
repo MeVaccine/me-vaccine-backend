@@ -27,6 +27,7 @@
     "@nestjs/mongoose": "^7.2.4",
     "@nestjs/platform-express": "^7.5.1",
     "@nestjs/swagger": "^4.8.0",
+    "@nestjs/throttler": "^1.1.4",
     "cache-manager": "^3.4.3",
     "class-transformer": "^0.4.0",
     "class-validator": "^0.13.1",
