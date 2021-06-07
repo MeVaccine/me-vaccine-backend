@@ -1,6 +1,8 @@
-import { Schema, Prop } from '@nestjs/mongoose'
+import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose'
 import { ApiProperty } from '@nestjs/swagger'
+import { Document } from 'mongoose'
 
+export type LocationDocument = Location & Document
 @Schema()
 export class Location {
 	@Prop()
@@ -63,3 +65,5 @@ export class DateTime {
 	@ApiProperty()
 	avaliable: number
 }
+
+export const LocationSchema = SchemaFactory.createForClass(Location)

@@ -1,5 +1,6 @@
-import { Prop, Schema } from '@nestjs/mongoose'
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { ApiProperty } from '@nestjs/swagger'
+import { Document } from 'mongoose'
 import { Location } from './Location.schema'
 
 export enum GenderEN {
@@ -12,6 +13,7 @@ export enum GenderTH {
 	Female = 'หญิง',
 }
 
+export type UserDocument = User & Document
 @Schema()
 export class User {
 	@Prop({ length: 13, required: true })
@@ -66,3 +68,5 @@ export class User {
 	@ApiProperty()
 	preferedLocation: Location
 }
+
+export const UserSchema = SchemaFactory.createForClass(User)
