@@ -7,7 +7,6 @@ import {
 } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { NationalIDQueryDto } from './dto/national-id-query.dto'
-import client from 'twilio'
 
 @Injectable()
 export class ApiService {
