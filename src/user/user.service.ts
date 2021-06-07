@@ -37,4 +37,8 @@ export class UserService {
 	findByNationalIdAndPhone(nationalID: string, phoneNumber: string) {
 		return this.userModel.findOne({ nationalID, phoneNumber, isPhoneVerify: true }).exec()
 	}
+
+	updateIsPhoneVerifyToTrue(userId: string) {
+		return this.userModel.updateOne({ _id: userId }, { isPhoneVerify: true })
+	}
 }

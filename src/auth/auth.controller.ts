@@ -17,6 +17,7 @@ import { OTPService } from 'src/api/otp.service'
 import { LocationService } from 'src/location/location.service'
 import { RequestOTPLoginDto } from './dto/login-request-otp.dto'
 import { VerifySuccessResponse } from './dto/verify-success-res.dto'
+import { AuthService } from './auth.service'
 
 @Controller('auth')
 @ApiTags('Authentication')
@@ -25,7 +26,8 @@ export class AuthController {
 		private userService: UserService,
 		private apiService: ApiService,
 		private otpService: OTPService,
-		private locationService: LocationService
+		private locationService: LocationService,
+		private authService: AuthService
 	) {}
 
 	@Post('regis')
@@ -77,6 +79,11 @@ export class AuthController {
 		const userId = await this.otpService.getIdFromOTP(otpCode)
 		if (!userId) throw new BadRequestException('OTP is not correct or expired')
 
+		// Set isPhoneVerify to true
+		await this.userService.updateIsPhoneVerifyToTrue(userId as string)
+
 		// Generate JWT and send it back
+		const token = await this.authService.generateJWT(userId as string)
+		return { token }
 	}
 }
