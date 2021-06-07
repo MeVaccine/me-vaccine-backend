@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { ApiProperty } from '@nestjs/swagger'
+import { ObjectID } from 'mongodb'
 import { Document } from 'mongoose'
 import { Location } from './Location.schema'
 
@@ -64,7 +65,7 @@ export class User {
 	@ApiProperty()
 	isPhoneVerify: boolean
 
-	@Prop()
+	@Prop({ type: ObjectID, ref: 'Location' })
 	@ApiProperty()
 	preferedLocation: Location
 }

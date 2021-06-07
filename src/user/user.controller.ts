@@ -42,12 +42,12 @@ export class UserController {
 		if (!existingUser) {
 			newUser = await this.userService.createUser(personData, regisNewUserDto.phoneNumber, preferedLocation)
 		} else {
-			await this.userService.updatePhoneNumberAndLocation(
-				existingUser.id,
-				regisNewUserDto.phoneNumber,
-				preferedLocation
-			)
-			await this.otpService.generatedAndSentOTP(existingUser.id.toString(), regisNewUserDto.phoneNumber)
+			// await this.userService.updatePhoneNumberAndLocation(
+			// 	existingUser.id,
+			// 	regisNewUserDto.phoneNumber,
+			// 	preferedLocation
+			// )
+			// await this.otpService.generatedAndSentOTP(existingUser.id.toString(), regisNewUserDto.phoneNumber)
 		}
 		// await this.otpService.generatedAndSentOTP(
 		// 	existingUser ? existingUser.id.toString() : newUser.id.toString(),
