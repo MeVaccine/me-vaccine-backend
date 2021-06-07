@@ -8,6 +8,7 @@ import { LocationModule } from './location/location.module'
 import { MongooseModule } from '@nestjs/mongoose'
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler'
 import { APP_GUARD } from '@nestjs/core'
+import { AuthModule } from './auth/auth.module';
 
 @Module({
 	imports: [
@@ -30,6 +31,7 @@ import { APP_GUARD } from '@nestjs/core'
 		UserModule,
 		ApiModule,
 		LocationModule,
+		AuthModule,
 	],
 	controllers: [AppController],
 	providers: [
