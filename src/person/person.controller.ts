@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, Post, Query, Res } from '@nestjs/common'
+import { BadRequestException, Body, Controller, Get, Post, Query, Res, UseGuards } from '@nestjs/common'
 import {
 	ApiBadRequestResponse,
 	ApiBearerAuth,
@@ -21,6 +21,7 @@ import { AddPersonResponseDto } from './dto/add-person-res.dto'
 import { AddPersonDto } from './dto/add-person.dto'
 import { PersonService } from './person.service'
 import { PersonListDto } from './dto/person-list.dto'
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard'
 
 @Controller('person')
 @ApiTags('Person')
@@ -33,6 +34,7 @@ export class PersonController {
 	) {}
 
 	@Get('lists')
+	@UseGuards(JwtAuthGuard)
 	@ApiOperation({ summary: 'List all of the person in this account' })
 	@ApiBearerAuth('Authorization')
 	@ApiOkResponse({ type: PersonListDto, isArray: true })
@@ -42,6 +44,7 @@ export class PersonController {
 	}
 
 	@Post('add/check')
+	@UseGuards(JwtAuthGuard)
 	@ApiOperation({ summary: 'First step to add a person. Check between existing user and new user to add' })
 	@ApiBearerAuth('Authorization')
 	@ApiOkResponse({ type: NationalInfoQueryDto })
@@ -64,6 +67,7 @@ export class PersonController {
 	}
 
 	@Post('add/regis')
+	@UseGuards(JwtAuthGuard)
 	@ApiOperation({ summary: 'Register new user for adding person' })
 	@ApiBearerAuth('Authorization')
 	@ApiCreatedResponse({ type: AddPersonResponseDto })
@@ -81,6 +85,7 @@ export class PersonController {
 	}
 
 	@Get('add/verify')
+	@UseGuards(JwtAuthGuard)
 	@ApiOperation({ summary: 'Verify OTP of adding person' })
 	@ApiBearerAuth('Authorization')
 	@ApiUnauthorizedResponse({ description: 'Missing or invalid JWT token' })

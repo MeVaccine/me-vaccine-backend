@@ -11,12 +11,6 @@ import { PersonService } from './person.service'
 @Module({
 	imports: [MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]), ApiModule, UserModule],
 	controllers: [PersonController],
-	providers: [
-		PersonService,
-		{
-			provide: APP_GUARD,
-			useClass: JwtAuthGuard,
-		},
-	],
+	providers: [ PersonService],
 })
 export class PersonModule {}
