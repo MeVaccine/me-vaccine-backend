@@ -15,7 +15,7 @@ export class PersonService {
 	}
 
 	async findAllPerson(userId: string) {
-		return this.userModel
+		const user = await this.userModel
 			.findById(userId, 'persons')
 			.populate('persons', [
 				'_id',
@@ -29,5 +29,6 @@ export class PersonService {
 				'gender_th',
 			])
 			.exec()
+		return user.persons
 	}
 }

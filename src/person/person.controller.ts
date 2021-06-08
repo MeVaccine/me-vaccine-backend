@@ -32,6 +32,15 @@ export class PersonController {
 		private personService: PersonService
 	) {}
 
+	@Get('lists')
+	@ApiOperation({ summary: 'List all of the person in this account' })
+	@ApiBearerAuth('Authorization')
+	@ApiOkResponse({ type: PersonListDto, isArray: true })
+	@ApiUnauthorizedResponse({ description: 'Missing or invalid JWT token' })
+	async listPerson(@User() user: UserDocument) {
+		return this.personService.findAllPerson(user._id)
+	}
+
 	@Post('add/check')
 	@ApiOperation({ summary: 'First step to add a person. Check between existing user and new user to add' })
 	@ApiBearerAuth('Authorization')
@@ -87,6 +96,6 @@ export class PersonController {
 
 		await this.personService.addPerson(user, personId as string)
 		const allPerson = await this.personService.findAllPerson(user._id)
-		return allPerson.persons
+		return allPerson
 	}
 }
