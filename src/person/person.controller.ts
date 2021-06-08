@@ -21,7 +21,11 @@ export class PersonController {
 	@ApiOperation({ summary: 'Add new person' })
 	@ApiOkResponse({ type: NationalInfoQueryDto })
 	@ApiCreatedResponse({ type: AddPersonResponseDto })
-	async addNewPerson(@User() user: UserDocument, @Body() { nationalID, laserID }: AddPersonDto, @Res() res) {
+	async addNewPerson(
+		@User() user: UserDocument,
+		@Body() { nationalID, laserID }: AddPersonDto,
+		@Res() res: Response
+	) {
 		// Check validity of nationalID and laserID
 		const personalInfo = await this.apiService.searchByNationalID(nationalID, laserID)
 
