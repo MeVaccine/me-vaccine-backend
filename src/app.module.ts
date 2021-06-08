@@ -9,6 +9,7 @@ import { MongooseModule } from '@nestjs/mongoose'
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler'
 import { APP_GUARD } from '@nestjs/core'
 import { AuthModule } from './auth/auth.module';
+import { PersonModule } from './person/person.module';
 
 @Module({
 	imports: [
@@ -32,6 +33,7 @@ import { AuthModule } from './auth/auth.module';
 		ApiModule,
 		LocationModule,
 		AuthModule,
+		PersonModule,
 	],
 	controllers: [AppController],
 	providers: [
