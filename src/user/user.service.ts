@@ -30,6 +30,10 @@ export class UserService {
 		return user.save()
 	}
 
+	findByID(userId: string) {
+		return this.userModel.findOne({ _id: userId }).exec()
+	}
+
 	findByNationalID(nationalID: string) {
 		return this.userModel.findOne({ nationalID }).exec()
 	}
