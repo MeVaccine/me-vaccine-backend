@@ -38,6 +38,10 @@ export class UserService {
 		return this.userModel.findOne({ nationalID }).exec()
 	}
 
+	findByNationalIDAndVerified(nationalID: string) {
+		return this.userModel.findOne({ nationalID, isPhoneVerify: true }).exec()
+	}
+
 	findByNationalIdAndPhone(nationalID: string, phoneNumber: string) {
 		return this.userModel.findOne({ nationalID, phoneNumber, isPhoneVerify: true }).exec()
 	}
