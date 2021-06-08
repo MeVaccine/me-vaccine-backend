@@ -11,6 +11,7 @@ async function bootstrap() {
 	const config = new DocumentBuilder()
 		.setTitle('MeVaccine API')
 		.setDescription('The MeVaccine API description')
+		.addBearerAuth({ type: 'http', description: 'JWT' }, 'Authorization')
 		.build()
 	const document = SwaggerModule.createDocument(app, config)
 	SwaggerModule.setup('swagger', app, document)

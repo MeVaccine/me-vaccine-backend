@@ -68,6 +68,10 @@ export class User {
 	@Prop({ type: ObjectID, ref: 'Location' })
 	@ApiProperty()
 	preferedLocation: Location
+
+	@Prop({ type: [{ type: ObjectID, ref: 'User' }] })
+	@ApiProperty()
+	persons: User[]
 }
 
 export const UserSchema = SchemaFactory.createForClass(User)
