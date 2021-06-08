@@ -9,7 +9,7 @@ import { NationalInfoQueryDto } from '../api/dto/national-id-query.dto'
 export class UserController {
 	constructor(private userService: UserService, private apiService: ApiService) {}
 
-	@Get('/nationalInfo')
+	@Get('nationalInfo')
 	@ApiOperation({ summary: 'Get user info from external national API' })
 	@ApiOkResponse({ type: NationalInfoQueryDto })
 	@ApiResponse({ status: 400, description: 'Not Found' })
