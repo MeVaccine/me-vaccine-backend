@@ -1,5 +1,5 @@
 import { UserService } from 'src/user/user.service'
-import { BadRequestException, Body, Controller, Get, NotFoundException, Post, Query, UseGuards } from '@nestjs/common'
+import { BadRequestException, Body, Controller, Get, NotFoundException, Post, Query } from '@nestjs/common'
 import {
 	ApiBadRequestResponse,
 	ApiCreatedResponse,
