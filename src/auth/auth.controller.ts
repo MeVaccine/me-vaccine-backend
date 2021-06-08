@@ -1,5 +1,5 @@
 import { UserService } from 'src/user/user.service'
-import { BadRequestException, Body, Controller, Get, NotFoundException, Post, Query } from '@nestjs/common'
+import { BadRequestException, Body, Controller, Get, NotFoundException, Post, Query, UseGuards } from '@nestjs/common'
 import {
 	ApiBadRequestResponse,
 	ApiCreatedResponse,
@@ -79,10 +79,7 @@ export class AuthController {
 		const userId = await this.otpService.getIdFromOTP(otpCode)
 		if (!userId) throw new BadRequestException('OTP is not correct or expired')
 
-		// Set isPhoneVerify to true
 		await this.userService.updateIsPhoneVerifyToTrue(userId as string)
-
-		// Generate JWT and send it back
 		const token = await this.authService.generateJWT(userId as string)
 		return { token }
 	}
