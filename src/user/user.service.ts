@@ -47,6 +47,6 @@ export class UserService {
 	}
 
 	updateIsPhoneVerifyToTrue(userId: string) {
-		return this.userModel.updateOne({ _id: userId }, { isPhoneVerify: true })
+		return this.userModel.updateOne({ _id: userId }, { isPhoneVerify: true }).exec()
 	}
 }

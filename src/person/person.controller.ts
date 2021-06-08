@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Res, UseGuards } from '@nestjs/common'
+import { BadRequestException, Body, Controller, Get, Post, Query, Res, UseGuards } from '@nestjs/common'
 import {
 	ApiBadRequestResponse,
 	ApiCreatedResponse,
@@ -13,16 +13,23 @@ import { NationalInfoQueryDto } from 'src/api/dto/national-id-query.dto'
 import { OTPService } from 'src/api/otp.service'
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard'
 import { User } from 'src/decorators/user.decorator'
-import { UserDocument } from 'src/schema/User.schema'
+import { UserDocument, UserSchema } from 'src/schema/User.schema'
 import { UserService } from 'src/user/user.service'
 import { AddPersonRegisDto } from './dto/add-person-regis.dto'
 import { AddPersonResponseDto } from './dto/add-person-res.dto'
 import { AddPersonDto } from './dto/add-person.dto'
+import { PersonService } from './person.service'
+import { PersonListDto } from './dto/person-list.dto'
 
 @Controller('person')
 @ApiTags('Person')
 export class PersonController {
-	constructor(private apiService: ApiService, private userService: UserService, private otpService: OTPService) {}
+	constructor(
+		private apiService: ApiService,
+		private userService: UserService,
+		private otpService: OTPService,
+		private personService: PersonService
+	) {}
 
 	@Post('add/check')
 	@UseGuards(JwtAuthGuard)
@@ -39,7 +46,7 @@ export class PersonController {
 		// Existing User
 		if (person) {
 			const refCode = await this.otpService.generatedAndSentOTP(person._id, person.phoneNumber)
-			return { refCode }
+			res.status(201).send({ refCode })
 		}
 		// New User
 		res.status(200).send(personalInfo)
@@ -59,5 +66,23 @@ export class PersonController {
 		const person = await this.userService.createUser(personalInfo, phoneNumber, user.preferedLocation)
 		const refCode = await this.otpService.generatedAndSentOTP(person._id, person.phoneNumber)
 		return { refCode }
+	}
+
+	@Get('add/verify')
+	@UseGuards(JwtAuthGuard)
+	@ApiOperation({ summary: 'Verify OTP of adding person' })
+	@ApiBadRequestResponse({
+		description: 'OTP is not correct or expired',
+	})
+	@ApiCreatedResponse({ type: PersonListDto, isArray: true })
+	async verifyPerson(@User() user: UserDocument, @Query('otp') otpCode: string) {
+		const personId = await this.otpService.getIdFromOTP(otpCode)
+		if (!personId) throw new BadRequestException('OTP is not correct or expired')
+
+		await this.userService.updateIsPhoneVerifyToTrue(personId as string)
+
+		await this.personService.addPerson(user, personId as string)
+		const allPerson = await this.personService.findAllPerson(user._id)
+		return allPerson.persons
 	}
 }
