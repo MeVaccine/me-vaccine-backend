@@ -42,7 +42,6 @@ export class LocationController {
 	async changePreferLocation(@User() user: UserDocument, @Body() { locationId }: ChangePreferedLocationDto) {
 		const location = await this.locationService.findById(locationId)
 		if (!location) throw new NotFoundException()
-		// TODO: Change location for all person too
 		await this.userService.changePreferedLocation(user._id, location)
 		return this.userService.getPreferedLocationWithoutDatetime(user._id)
 	}
