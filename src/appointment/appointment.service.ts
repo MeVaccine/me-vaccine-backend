@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { User, UserDocument } from 'src/schema/User.schema'
 import { Appointment, AppointmentStatus } from 'src/schema/Appointment.schema'
-import { LocationDocument } from 'src/schema/Location.schema'
+import { LocationDocument, VaccineName } from 'src/schema/Location.schema'
 
 @Injectable()
 export class AppointmentService {
@@ -13,7 +13,7 @@ export class AppointmentService {
 		user: UserDocument,
 		locationId: LocationDocument,
 		dateTime: Date,
-		vaccine: string,
+		vaccine: VaccineName,
 		doseNumber: number
 	) {
 		const appointment = new Appointment()
