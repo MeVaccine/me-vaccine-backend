@@ -32,7 +32,11 @@ export class AuthController {
 
 	@Post('regis')
 	@ApiOperation({ summary: 'Register new user' })
-	@ApiResponse({ status: 201, type: RefCodeResponse })
+	@ApiResponse({
+		status: 201,
+		type: RefCodeResponse,
+		description: 'RefCode of the OTP send to the user mobile phone',
+	})
 	@ApiBadRequestResponse({ description: 'LaserID and/or natioalID is/are in wrong format' })
 	@ApiNotFoundResponse({ description: 'Not found in national external API' })
 	async registerNewUser(@Body() { laserID, nationalID, phoneNumber, preferedLocation }: RegisNewUserDto) {
@@ -57,7 +61,7 @@ export class AuthController {
 
 	@Post('login')
 	@ApiOperation({ summary: 'Request OTP for user loging in using national ID and phone number' })
-	@ApiCreatedResponse({ type: RefCodeResponse })
+	@ApiCreatedResponse({ type: RefCodeResponse, description: 'RefCode of the OTP send to the user mobile phone' })
 	@ApiBadRequestResponse({
 		description: 'National ID and/or phoneNumber is not correct or user have not register yet',
 	})
@@ -71,7 +75,10 @@ export class AuthController {
 
 	@Get('verify')
 	@ApiOperation({ summary: 'Get the OTP code and return JWT token' })
-	@ApiOkResponse({ type: VerifySuccessResponse })
+	@ApiOkResponse({
+		type: VerifySuccessResponse,
+		description: 'JWT token that must be store in user device and use in protected API route',
+	})
 	@ApiBadRequestResponse({
 		description: 'OTP is not correct or expired',
 	})

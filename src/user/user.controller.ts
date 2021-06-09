@@ -11,7 +11,7 @@ export class UserController {
 
 	@Get('nationalInfo')
 	@ApiOperation({ summary: 'Get user info from external national API' })
-	@ApiOkResponse({ type: NationalInfoQueryDto })
+	@ApiOkResponse({ type: NationalInfoQueryDto, description: 'Natinal information to show the user' })
 	@ApiResponse({ status: 400, description: 'Not Found' })
 	@ApiResponse({ status: 404, description: 'LaserID and/or natioalID is/are in wrong format' })
 	async getPersonalInfo(@Query('nationalID') nationalID: string, @Query('laserID') laserID: string) {
