@@ -60,11 +60,10 @@ export class PersonController {
 		@Res() res: Response
 	) {
 		if (user.nationalID == nationalID) throw new BadRequestException('Cannot add yourself')
-		// Check validity of nationalID and laserID
-		const personalInfo = await this.apiService.searchByNationalID(nationalID, laserID)
 		const isExceeded = await this.personService.isExceededPersonLimit(user._id)
 		if (isExceeded) throw new BadRequestException('5 Person limit is reached')
-
+		// Check validity of nationalID and laserID
+		const personalInfo = await this.apiService.searchByNationalID(nationalID, laserID)
 		const person = await this.userService.findByNationalIDAndVerified(nationalID)
 		// Existing User
 		if (person) {
@@ -81,13 +80,19 @@ export class PersonController {
 	@ApiBearerAuth('Authorization')
 	@ApiCreatedResponse({ type: AddPersonResponseDto })
 	@ApiBadRequestResponse({ description: 'LaserID and/or natioalID is/are in wrong format' })
+	@ApiBadRequestResponse({ description: '5 Person limit is reached' })
+	@ApiBadRequestResponse({ description: 'Cannot add yourself' })
 	@ApiNotFoundResponse({ description: 'Not found in national external API' })
 	@ApiUnauthorizedResponse({ description: 'Missing or invalid JWT token' })
 	async newPersonRegister(
 		@User() user: UserDocument,
 		@Body() { nationalID, laserID, phoneNumber }: AddPersonRegisDto
 	) {
-		// TODO: Catch edge case Ex: Using nationalID of existing user
+		// Catch 5 limit and adding yourself
+		if (user.nationalID == nationalID) throw new BadRequestException('Cannot add yourself')
+		const isExceeded = await this.personService.isExceededPersonLimit(user._id)
+		if (isExceeded) throw new BadRequestException('5 Person limit is reached')
+
 		const personalInfo = await this.apiService.searchByNationalID(nationalID, laserID)
 		const person = await this.userService.createUser(personalInfo, phoneNumber, user.preferedLocation)
 		const refCode = await this.otpService.generatedAndSentOTP(person._id, person.phoneNumber)
