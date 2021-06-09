@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common'
+import { BadRequestException, Body, Controller, Post, UseGuards } from '@nestjs/common'
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard'
 import { User } from 'src/decorators/user.decorator'
 import { LocationService } from 'src/location/location.service'
@@ -14,6 +14,7 @@ export class AppointmentController {
 	@UseGuards(JwtAuthGuard)
 	async makeNewAppointment(@User() user: UserDocument, @Body() data: NewAppointmentDto) {
 		const location = await this.locationService.findById(data.locationId)
+		if (!location) throw new BadRequestException('Location and/or dateTime and/or vaccube is not found')
 		await this.appointmentService.newAppointment(user, location, data.dateTime, data.person[0].vaccine, 1)
 		const updatedUser = await this.appointmentService.getAllAppointment(user._id)
 		return updatedUser.appointments
