@@ -3,6 +3,7 @@ import { ApiProperty } from '@nestjs/swagger'
 import { ObjectID } from 'mongodb'
 import { Document } from 'mongoose'
 import { Location } from './Location.schema'
+import { Appointment, AppointmentSchema } from './Appointment.schema'
 
 export enum GenderEN {
 	MALE = 'Male',
@@ -12,12 +13,6 @@ export enum GenderEN {
 export enum GenderTH {
 	MALE = 'ชาย',
 	Female = 'หญิง',
-}
-
-export enum AppointmentStatus {
-	APPOINTED = 'Appointed',
-	VACCINATED = 'Vaccinated',
-	CANCELED = 'Canceled',
 }
 
 export type UserDocument = User & Document
@@ -79,34 +74,9 @@ export class User {
 	@ApiProperty()
 	persons: User[]
 
-	@Prop()
+	@Prop({ type: [{ type: AppointmentSchema }] })
 	@ApiProperty()
 	appointments: Appointment[]
-}
-
-export class Appointment {
-	@Prop({ type: ObjectID, ref: 'Location' })
-	@ApiProperty()
-	location: Location
-
-	@Prop()
-	@ApiProperty()
-	dateTime: Date
-
-	@Prop()
-	@ApiProperty()
-	vaccine: string
-
-	@Prop()
-	@ApiProperty()
-	doseNumber: number
-
-	@Prop({
-		enum: [AppointmentStatus.APPOINTED, AppointmentStatus.CANCELED, AppointmentStatus.VACCINATED],
-		default: AppointmentStatus.APPOINTED,
-	})
-	@ApiProperty()
-	status: AppointmentStatus
 }
 
 export const UserSchema = SchemaFactory.createForClass(User)
