@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, Post, Query, Res, UseGuards } from '@nestjs/common'
+import { BadRequestException, Body, Controller, Delete, Get, Param, Post, Query, Res, UseGuards } from '@nestjs/common'
 import {
 	ApiBadRequestResponse,
 	ApiBearerAuth,
@@ -124,5 +124,16 @@ export class PersonController {
 		await this.personService.addPerson(user, personId as string)
 		const allPerson = await this.personService.findAllPerson(user._id)
 		return allPerson
+	}
+
+	@Delete('/:personId')
+	@UseGuards(JwtAuthGuard)
+	@ApiOkResponse({ type: PersonListDto, isArray: true, description: 'Return array of all person' })
+	@ApiOperation({ summary: 'Delete an person by ID' })
+	@ApiBearerAuth('Authorization')
+	@ApiUnauthorizedResponse({ description: 'Missing or invalid JWT token' })
+	async deletePerson(@Param('personId') personId: string, @User() user: UserDocument) {
+		await this.personService.deletePerson(user._id, personId)
+		return this.personService.findAllPerson(user._id)
 	}
 }
