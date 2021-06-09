@@ -3,6 +3,14 @@ import { ApiProperty } from '@nestjs/swagger'
 import { Document } from 'mongoose'
 
 export type LocationDocument = Location & Document
+
+export enum VaccineName {
+	SINOVAC = 'Sinovac',
+	SINOPHARM = 'Sinopharm',
+	ASTRAZENECA = 'Oxford–AstraZeneca',
+	PFIZER = 'Pfizer-BioNTech',
+	MODERNA = 'Moderna',
+}
 @Schema()
 export class Location {
 	@Prop()
@@ -35,9 +43,17 @@ export class Location {
 }
 
 export class Vaccine {
-	@Prop()
+	@Prop({
+		enum: [
+			VaccineName.ASTRAZENECA,
+			VaccineName.MODERNA,
+			VaccineName.PFIZER,
+			VaccineName.SINOPHARM,
+			VaccineName.SINOVAC,
+		],
+	})
 	@ApiProperty()
-	name: string
+	name: VaccineName
 
 	@Prop()
 	@ApiProperty()
