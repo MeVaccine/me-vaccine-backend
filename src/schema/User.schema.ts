@@ -14,6 +14,12 @@ export enum GenderTH {
 	Female = 'หญิง',
 }
 
+export enum AppointmentStatus {
+	APPOINTED = 'Appointed',
+	VACCINATED = 'Vaccinated',
+	CANCELED = 'Canceled',
+}
+
 export type UserDocument = User & Document
 @Schema()
 export class User {
@@ -33,7 +39,7 @@ export class User {
 	@ApiProperty()
 	lastname_th: string
 
-	@Prop({ enum: ['ชาย', 'หญิง'] })
+	@Prop({ enum: [GenderTH.Female, GenderTH.MALE] })
 	@ApiProperty()
 	gender_th: GenderTH
 
@@ -49,7 +55,7 @@ export class User {
 	@ApiProperty()
 	lastname_en: string
 
-	@Prop({ enum: ['Male', 'Female'] })
+	@Prop({ enum: [GenderEN.Female, GenderEN.MALE] })
 	@ApiProperty()
 	gender_en: GenderEN
 
@@ -72,6 +78,35 @@ export class User {
 	@Prop({ type: [{ type: ObjectID, ref: 'User' }] })
 	@ApiProperty()
 	persons: User[]
+
+	@Prop()
+	@ApiProperty()
+	appointments: Appointment[]
+}
+
+export class Appointment {
+	@Prop({ type: ObjectID, ref: 'Location' })
+	@ApiProperty()
+	location: Location
+
+	@Prop()
+	@ApiProperty()
+	dateTime: Date
+
+	@Prop()
+	@ApiProperty()
+	vaccine: string
+
+	@Prop()
+	@ApiProperty()
+	doseNumber: number
+
+	@Prop({
+		enum: [AppointmentStatus.APPOINTED, AppointmentStatus.CANCELED, AppointmentStatus.VACCINATED],
+		default: AppointmentStatus.APPOINTED,
+	})
+	@ApiProperty()
+	status: AppointmentStatus
 }
 
 export const UserSchema = SchemaFactory.createForClass(User)
