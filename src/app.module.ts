@@ -10,6 +10,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler'
 import { APP_GUARD } from '@nestjs/core'
 import { AuthModule } from './auth/auth.module';
 import { PersonModule } from './person/person.module';
+import { AppointmentModule } from './appointment/appointment.module';
 
 @Module({
 	imports: [
@@ -34,6 +35,7 @@ import { PersonModule } from './person/person.module';
 		LocationModule,
 		AuthModule,
 		PersonModule,
+		AppointmentModule,
 	],
 	controllers: [AppController],
 	providers: [
