@@ -44,4 +44,8 @@ export class PersonService {
 		const count = await this.countPerson(userId)
 		return count === 5
 	}
+
+	async deletePerson(userId: string, personId: string) {
+		return this.userModel.updateOne({ _id: userId }, { $pull: { persons: personId } })
+	}
 }
