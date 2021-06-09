@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { NationalIDQueryDto } from 'src/api/dto/national-id-query.dto'
-import { Location } from 'src/schema/Location.schema'
+import { Location, LocationDocument } from 'src/schema/Location.schema'
 import { GenderEN, GenderTH, User, UserDocument } from 'src/schema/User.schema'
 
 @Injectable()
@@ -48,5 +48,22 @@ export class UserService {
 
 	updateIsPhoneVerifyToTrue(userId: string) {
 		return this.userModel.updateOne({ _id: userId }, { isPhoneVerify: true }).exec()
+	}
+
+	changePreferedLocation(userId: string, newLocation: LocationDocument) {
+		return this.userModel.updateOne({ _id: userId }, { preferedLocation: newLocation }).exec()
+	}
+
+	async getPreferedLocation(userId: string) {
+		const user = await this.userModel.findById(userId, 'preferedLocation').populate('preferedLocation').exec()
+		return user.preferedLocation
+	}
+
+	async getPreferedLocationWithoutDatetime(userId: string) {
+		const user = await this.userModel
+			.findById(userId, 'preferedLocation')
+			.populate('preferedLocation', ['_id', 'name_th', 'name_en', 'priority', 'province_th', 'province_en'])
+			.exec()
+		return user.preferedLocation
 	}
 }

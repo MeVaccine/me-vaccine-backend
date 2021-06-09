@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
-import { Model } from 'mongoose'
+import { Model, ObjectId } from 'mongoose'
 import { User, UserDocument } from 'src/schema/User.schema'
 import { UserService } from 'src/user/user.service'
 
@@ -30,5 +30,18 @@ export class PersonService {
 			])
 			.exec()
 		return user.persons
+	}
+
+	async countPerson(userId: ObjectId): Promise<number> {
+		const persons = await this.userModel
+			.aggregate([{ $match: { _id: userId } }, { $project: { count: { $size: '$persons' } } }])
+			.exec()
+		console.log(persons)
+		return persons[0].count
+	}
+
+	async isExceededPersonLimit(userId: ObjectId): Promise<boolean> {
+		const count = await this.countPerson(userId)
+		return count === 5
 	}
 }
