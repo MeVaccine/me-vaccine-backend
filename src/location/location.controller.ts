@@ -35,7 +35,7 @@ export class LocationController {
 	@UseGuards(JwtAuthGuard)
 	@ApiOperation({ summary: 'Change prefered location of user and all person' })
 	@ApiBearerAuth('Authorization')
-	@ApiOkResponse({ type: PreferedLocationDto })
+	@ApiOkResponse({ type: PreferedLocationDto, description: 'The updated location' })
 	@ApiNotFoundResponse({ description: 'Location not found' })
 	@ApiBadRequestResponse({ description: 'locationId is not valid a Mongo ObjectId' })
 	@ApiUnauthorizedResponse({ description: 'Missing or invalid JWT token' })

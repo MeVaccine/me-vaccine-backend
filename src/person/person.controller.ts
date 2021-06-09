@@ -47,8 +47,15 @@ export class PersonController {
 	@UseGuards(JwtAuthGuard)
 	@ApiOperation({ summary: 'First step to add a person. Check between existing user and new user to add' })
 	@ApiBearerAuth('Authorization')
-	@ApiOkResponse({ type: NationalInfoQueryDto })
-	@ApiCreatedResponse({ type: AddPersonResponseDto })
+	@ApiOkResponse({
+		description:
+			'The user has not register or verify yet. So, take user to information screen to add mobile phone number',
+		type: NationalInfoQueryDto,
+	})
+	@ApiCreatedResponse({
+		description: 'The user already register and verify. Sending OTP to registeed mobile phone number',
+		type: AddPersonResponseDto,
+	})
 	@ApiBadRequestResponse({ description: 'LaserID and/or natioalID is/are in wrong format' })
 	@ApiBadRequestResponse({ description: '5 Person limit is reached' })
 	@ApiBadRequestResponse({ description: 'Cannot add yourself' })
@@ -78,7 +85,7 @@ export class PersonController {
 	@UseGuards(JwtAuthGuard)
 	@ApiOperation({ summary: 'Register new user for adding person' })
 	@ApiBearerAuth('Authorization')
-	@ApiCreatedResponse({ type: AddPersonResponseDto })
+	@ApiCreatedResponse({ description: 'Retun refCode of OTP send to the mobile phone', type: AddPersonResponseDto })
 	@ApiBadRequestResponse({ description: 'LaserID and/or natioalID is/are in wrong format' })
 	@ApiBadRequestResponse({ description: '5 Person limit is reached' })
 	@ApiBadRequestResponse({ description: 'Cannot add yourself' })
@@ -107,7 +114,7 @@ export class PersonController {
 	@ApiBadRequestResponse({
 		description: 'OTP is not correct or expired',
 	})
-	@ApiCreatedResponse({ type: PersonListDto, isArray: true })
+	@ApiCreatedResponse({ type: PersonListDto, isArray: true, description: 'Return array of all person' })
 	async verifyPerson(@User() user: UserDocument, @Query('otp') otpCode: string) {
 		const personId = await this.otpService.getIdFromOTP(otpCode)
 		if (!personId) throw new BadRequestException('OTP is not correct or expired')
