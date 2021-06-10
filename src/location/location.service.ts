@@ -20,7 +20,7 @@ export class LocationService {
 			.exec()
 	}
 
-	async isValidForAppointment(data: NewAppointmentDto) {
+	async isValidForAppointment(data: NewAppointmentDto, neededVaccine: Record<string, number>) {
 		const location = await this.locationModel
 			.findOne(
 				{
@@ -44,12 +44,6 @@ export class LocationService {
 			)
 
 		// Count number of vaccine and check if enough
-		const neededVaccine: Record<string, number> = {}
-		data.person.forEach(el => {
-			if (!neededVaccine[el.vaccineId]) {
-				neededVaccine[el.vaccineId] = 1
-			} else neededVaccine[el.vaccineId] += 1
-		})
 
 		for (const vaccine in neededVaccine) {
 			const vaccineIndex = location.vaccines.findIndex(el => el.vaccine._id.equals(vaccine))

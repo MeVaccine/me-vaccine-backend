@@ -12,10 +12,10 @@ export class NewAppointmentDto {
 
 	@ApiProperty()
 	@IsArray()
-	person: NewAppointmentPerson[]
+	person: NewAppointmentPersonDto[]
 }
 
-export class NewAppointmentPerson {
+export class NewAppointmentPersonDto {
 	@ApiProperty()
 	@IsMongoId()
 	id: string
