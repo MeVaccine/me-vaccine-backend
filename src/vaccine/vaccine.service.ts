@@ -26,24 +26,34 @@ export class VaccineService {
 		const user = await this.userService.findByID(userId)
 		const now = dayjs.utc().utcOffset(7)
 		const age = now.diff(dayjs(user.dateOfBirth), 'year')
-		return this.vaccineModel
-			.find({ minAge: { $lte: age }, $or: [{ maxAge: undefined }, { maxAge: { $gte: age } }] }, ['_id', 'name'])
-			.lean()
-			.exec()
+		return (
+			this.vaccineModel
+				.find({ minAge: { $lte: age }, $or: [{ maxAge: undefined }, { maxAge: { $gte: age } }] }, [
+					'_id',
+					'name',
+				])
+				// .lean()
+				.exec()
+		)
 	}
 
 	async checkVaccinePersonValidity(personAppointments: NewAppointmentPersonDto[]) {
 		const ops = personAppointments.map(el => this.getVaccinableVaccine(el.id))
 		const vaccinableVaccine = await Promise.all(ops)
+		const neededVaccines: VaccineDocument[] = []
 		for (let i = 0; i < personAppointments.length; i++) {
-			const isVaccineable = vaccinableVaccine[i].some(vaccine => vaccine._id == personAppointments[i].vaccineId)
-			if (!isVaccineable)
+			const neededVaccineIndex = vaccinableVaccine[i].findIndex(
+				vaccine => vaccine._id == personAppointments[i].vaccineId
+			)
+			if (neededVaccineIndex === -1)
 				throw new BadRequestException(
 					new NewAppointmentExceptionDto(
 						'Your selected of vaccine is not suitable for some person',
 						'วัคซีนที่ท่านเลือก ไม่สามารถฉีดให้กับบุคคลของท่านได้'
 					)
 				)
+			neededVaccines.push(vaccinableVaccine[i][neededVaccineIndex])
 		}
+		return neededVaccines
 	}
 }

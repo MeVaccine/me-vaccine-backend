@@ -7,6 +7,7 @@ import { LocationModule } from 'src/location/location.module'
 import { PersonModule } from 'src/person/person.module'
 import { Vaccine, VaccineSchema } from 'src/schema/Vaccine.schema'
 import { VaccineModule } from 'src/vaccine/vaccine.module'
+import { UserModule } from 'src/user/user.module'
 
 @Module({
 	imports: [
@@ -17,6 +18,7 @@ import { VaccineModule } from 'src/vaccine/vaccine.module'
 		LocationModule,
 		PersonModule,
 		VaccineModule,
+		UserModule,
 	],
 	providers: [AppointmentService],
 	controllers: [AppointmentController],

@@ -27,7 +27,8 @@ export class AppointmentService {
 		appointment.status = AppointmentStatus.APPOINTED
 		appointment.vaccine = vaccine
 		user.appointments.push(appointment)
-		return user.save()
+		await user.save()
+		return appointment
 	}
 
 	async getAllAppointment(userId: string) {
