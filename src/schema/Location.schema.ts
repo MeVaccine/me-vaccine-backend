@@ -47,7 +47,7 @@ export class Location {
 export class Vaccine {
 	@Prop({ type: ObjectID, ref: 'Vaccine' })
 	@ApiProperty()
-	name: VaccineClass
+	vaccine: VaccineClass
 
 	@Prop()
 	@ApiProperty()
