@@ -1,8 +1,9 @@
-import { BadRequestException, Body, Controller, Post, Put, UseGuards } from '@nestjs/common'
-import { ApiOkResponse, ApiOperation } from '@nestjs/swagger'
+import { BadRequestException, Body, Controller, Get, HttpCode, Post, Put, Query, UseGuards } from '@nestjs/common'
+import { ApiBadRequestResponse, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger'
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard'
 import { User } from 'src/decorators/user.decorator'
 import { LocationService } from 'src/location/location.service'
+import { PersonService } from 'src/person/person.service'
 import { Appointment } from 'src/schema/Appointment.schema'
 import { UserDocument } from 'src/schema/User.schema'
 import { Vaccine, VaccineDocument } from 'src/schema/Vaccine.schema'
@@ -13,16 +14,21 @@ import { NewAppointmentExceptionDto } from './dto/new-appointment-exception.dto'
 import { NewAppointmentDto } from './dto/new-appointment.dto'
 
 @Controller('appointment')
+@ApiTags('Appointment')
 export class AppointmentController {
 	constructor(
 		private userService: UserService,
 		private appointmentService: AppointmentService,
 		private locationService: LocationService,
-		private vaccineService: VaccineService
+		private vaccineService: VaccineService,
+		private personSerivce: PersonService
 	) {}
 
 	@Post('new')
 	@UseGuards(JwtAuthGuard)
+	@ApiOperation({ description: 'Create new appointment' })
+	@ApiCreatedResponse()
+	@ApiBadRequestResponse({ type: NewAppointmentExceptionDto })
 	async makeNewAppointment(@User() user: UserDocument, @Body() data: NewAppointmentDto) {
 		// Count number of vaccine needed
 		const neededVaccine: Record<string, number> = {}
@@ -50,6 +56,8 @@ export class AppointmentController {
 
 		// TODO: Findout dose number of each user
 
+		// TODO: Check that each person is really under user
+
 		// Create an appointment for each user
 		const createAppointmentsOps: Promise<Appointment>[] = users.map((el, index) =>
 			this.appointmentService.newAppointment(el, location, data.dateTime, vaccines[index], 1)
@@ -68,6 +76,7 @@ export class AppointmentController {
 
 	@Put('vaccine')
 	@UseGuards(JwtAuthGuard)
+	@HttpCode(200)
 	@ApiOperation({ description: 'Get the vaccinable vaccine for each person' })
 	@ApiOkResponse({
 		type: Vaccine,
@@ -77,5 +86,14 @@ export class AppointmentController {
 	async getVaccinableVaccine(@Body() ids: string[]) {
 		const ops: Promise<VaccineDocument[]>[] = ids.map(id => this.vaccineService.getVaccinableVaccine(id))
 		return Promise.all(ops)
+	}
+
+	@Get()
+	@UseGuards(JwtAuthGuard)
+	async getAppointments(@User() user: UserDocument, @Query('id') personId: string) {
+		if (!personId || user._id === personId) return this.appointmentService.getAllAppointment(user._id)
+		const isPersonOfUser = await this.personSerivce.isPersonOfUser(user._id, personId)
+		if (!isPersonOfUser) throw new BadRequestException('Your are querying user that not your person')
+		return this.appointmentService.getAllAppointment(personId)
 	}
 }

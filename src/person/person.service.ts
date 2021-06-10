@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
+import { ObjectID } from 'mongodb'
 import { Model, ObjectId } from 'mongoose'
 import { User, UserDocument } from 'src/schema/User.schema'
 import { UserService } from 'src/user/user.service'
@@ -47,5 +48,22 @@ export class PersonService {
 
 	async deletePerson(userId: string, personId: string) {
 		return this.userModel.updateOne({ _id: userId }, { $pull: { persons: personId } })
+	}
+
+	async isPersonOfUser(userId: string, personId: string): Promise<boolean> {
+		const person = await this.userModel.aggregate([
+			{
+				$match: {
+					_id: new ObjectID(userId),
+					persons: new ObjectID(personId),
+				},
+			},
+			{
+				$project: {
+					_id: true,
+				},
+			},
+		])
+		return person[0] ? true : false
 	}
 }

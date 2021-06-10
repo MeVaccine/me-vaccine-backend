@@ -1,6 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { IsArray, IsDateString, IsMongoId } from 'class-validator'
+export class NewAppointmentPersonDto {
+	@ApiProperty()
+	@IsMongoId()
+	id: string
 
+	@ApiProperty()
+	@IsMongoId()
+	vaccineId: string
+}
 export class NewAppointmentDto {
 	@ApiProperty()
 	@IsMongoId()
@@ -10,17 +18,7 @@ export class NewAppointmentDto {
 	@IsDateString()
 	dateTime: Date
 
-	@ApiProperty()
+	@ApiProperty({ type: NewAppointmentPersonDto })
 	@IsArray()
 	person: NewAppointmentPersonDto[]
-}
-
-export class NewAppointmentPersonDto {
-	@ApiProperty()
-	@IsMongoId()
-	id: string
-
-	@ApiProperty()
-	@IsMongoId()
-	vaccineId: string
 }
