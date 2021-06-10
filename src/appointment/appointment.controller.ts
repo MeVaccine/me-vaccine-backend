@@ -47,10 +47,15 @@ export class AppointmentController {
 		if (users.some(el => el === undefined))
 			throw new BadRequestException(new NewAppointmentExceptionDto('Some or every User is not found', ''))
 
+		// TODO: Findout dose number of each user
+
 		// Create an appointment for each user
 		const createAppointmentsOps: Promise<Appointment>[] = users.map((el, index) =>
 			this.appointmentService.newAppointment(el, location, data.dateTime, vaccines[index], 1)
 		)
+
+		// TODO: Decrease number of vaccine and location capacity
+
 		const appointments = await Promise.all(createAppointmentsOps)
 		return appointments.map(el => {
 			const appointment = { ...el }
