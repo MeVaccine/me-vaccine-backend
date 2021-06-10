@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
+import { ObjectId } from 'mongodb'
 import { Model } from 'mongoose'
 import { NewAppointmentExceptionDto } from 'src/appointment/dto/new-appointment-exception.dto'
 import { NewAppointmentDto } from 'src/appointment/dto/new-appointment.dto'
@@ -16,17 +17,25 @@ export class LocationService {
 	findById(locationId: string) {
 		return this.locationModel
 			.findOne({ _id: locationId })
-			.populate('vaccines.vaccine', 'name', this.vaccineModel)
+			.populate('vaccines.vaccine', ['name', 'minAge', 'maxAge'], this.vaccineModel)
 			.exec()
 	}
 
-	async isValidForAppointment(data: NewAppointmentDto): Promise<boolean> {
-		const location = await this.findById(data.locationId)
-		// Check dateTime at this location is avaliable
-		const selectedDateTime = location.dateTime.find(
-			el => el.startDateTime === data.dateTime && el.avaliable >= data.person.length
-		)
-		if (!selectedDateTime)
+	async isValidForAppointment(data: NewAppointmentDto) {
+		const location = await this.locationModel
+			.findOne(
+				{
+					_id: data.locationId,
+					dateTime: {
+						$elemMatch: { startDateTime: data.dateTime, avaliable: { $gte: data.person.length } },
+					},
+				},
+				{ dateTime: false }
+			)
+			.populate('vaccines.vaccine', ['name', 'minAge', 'maxAge'], this.vaccineModel)
+			.exec()
+
+		if (!location)
 			throw new BadRequestException(
 				new NewAppointmentExceptionDto(
 					`Your selected date and time is not avaliable for ${data.person.length} person`,
@@ -35,14 +44,14 @@ export class LocationService {
 			)
 
 		// Count number of vaccine and check if enough
-		const neededVaccine: Record<string, number> = {}
-		data.person.forEach(el => {
-			if (!neededVaccine[el.vaccineId]) {
-				neededVaccine[el.vaccineId] = 1
-			} else neededVaccine[el.vaccineId] += 1
-		})
+		// const neededVaccine: Record<string, number> = {}
+		// data.person.forEach(el => {
+		// 	if (!neededVaccine[el.vaccineId]) {
+		// 		neededVaccine[el.vaccineId] = 1
+		// 	} else neededVaccine[el.vaccineId] += 1
+		// })
 
-		console.log(location.vaccines)
+		// console.log(location.vaccines)
 		// const neededVaccineCheck: Promise[] = []
 		// for (const vaccine in neededVaccine) {
 		// 	location.vaccines.findIndex(el => el.vaccine == vaccine)

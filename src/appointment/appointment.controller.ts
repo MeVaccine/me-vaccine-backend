@@ -22,6 +22,6 @@ export class AppointmentController {
 		// const updatedUser = await this.appointmentService.getAllAppointment(user._id)
 		// return updatedUser.appointments
 
-		await this.locationService.isValidForAppointment(data)
+		return this.locationService.isValidForAppointment(data)
 	}
 }
