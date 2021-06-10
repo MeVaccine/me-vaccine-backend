@@ -5,6 +5,7 @@ import { User } from 'src/decorators/user.decorator'
 import { LocationService } from 'src/location/location.service'
 import { Appointment } from 'src/schema/Appointment.schema'
 import { UserDocument } from 'src/schema/User.schema'
+import { Vaccine, VaccineDocument } from 'src/schema/Vaccine.schema'
 import { UserService } from 'src/user/user.service'
 import { VaccineService } from 'src/vaccine/vaccine.service'
 import { AppointmentService } from './appointment.service'
@@ -68,9 +69,13 @@ export class AppointmentController {
 	@Put('vaccine')
 	@UseGuards(JwtAuthGuard)
 	@ApiOperation({ description: 'Get the vaccinable vaccine for each person' })
-	@ApiOkResponse()
+	@ApiOkResponse({
+		type: Vaccine,
+		isArray: true,
+		description: 'The actual response is array (person) of array of vaccine',
+	})
 	async getVaccinableVaccine(@Body() ids: string[]) {
-		const ops = ids.map(id => this.vaccineService.getVaccinableVaccine(id))
+		const ops: Promise<VaccineDocument[]>[] = ids.map(id => this.vaccineService.getVaccinableVaccine(id))
 		return Promise.all(ops)
 	}
 }
