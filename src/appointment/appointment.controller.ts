@@ -26,10 +26,10 @@ export class AppointmentController {
 				neededVaccine[el.vaccineId] = 1
 			} else neededVaccine[el.vaccineId] += 1
 		})
+		await this.vaccineService.checkVaccinePersonValidity(data.person)
 
 		const location = await this.locationService.findById(data.locationId)
 		if (!location) throw new BadRequestException('Location and/or dateTime and/or vaccube is not found')
-
 		await this.locationService.isValidForAppointment(data, neededVaccine)
 
 		// await this.appointmentService.newAppointment(user, location, data.dateTime, vaccine, 1)
