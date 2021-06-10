@@ -3,6 +3,7 @@ import { ApiProperty } from '@nestjs/swagger'
 import { Document } from 'mongoose'
 import { ObjectID } from 'mongodb'
 import { Vaccine as VaccineClass } from 'src/schema/Vaccine.schema'
+import { VaccineLocation, VaccineLocationSchema } from './VaccineLocation.schema'
 
 export type LocationDocument = Location & Document
 
@@ -13,6 +14,7 @@ export enum VaccineName {
 	PFIZER = 'Pfizer-BioNTech',
 	MODERNA = 'Moderna',
 }
+
 @Schema()
 export class Location {
 	@Prop()
@@ -35,27 +37,13 @@ export class Location {
 	@ApiProperty()
 	province_en: string
 
-	@Prop()
+	@Prop({ type: [{ type: VaccineLocationSchema }] })
 	@ApiProperty()
-	vaccines: Vaccine[]
+	vaccines: VaccineLocation[]
 
 	@Prop()
 	@ApiProperty()
 	dateTime: DateTime[]
-}
-
-export class Vaccine {
-	@Prop({ type: ObjectID, ref: 'Vaccine' })
-	@ApiProperty()
-	vaccine: VaccineClass
-
-	@Prop()
-	@ApiProperty()
-	amount: number
-
-	@Prop()
-	@ApiProperty()
-	avaliable: number
 }
 
 export class DateTime {

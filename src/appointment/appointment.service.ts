@@ -4,16 +4,20 @@ import { Model } from 'mongoose'
 import { User, UserDocument } from 'src/schema/User.schema'
 import { Appointment, AppointmentStatus } from 'src/schema/Appointment.schema'
 import { LocationDocument, VaccineName } from 'src/schema/Location.schema'
+import { Vaccine, VaccineDocument } from 'src/schema/Vaccine.schema'
 
 @Injectable()
 export class AppointmentService {
-	constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
+	constructor(
+		@InjectModel(User.name) private userModel: Model<UserDocument>,
+		@InjectModel(Vaccine.name) private vaccineModel: Model<VaccineDocument>
+	) {}
 
 	async newAppointment(
 		user: UserDocument,
 		locationId: LocationDocument,
 		dateTime: Date,
-		vaccine: VaccineName,
+		vaccine: VaccineDocument,
 		doseNumber: number
 	) {
 		const appointment = new Appointment()
@@ -30,6 +34,11 @@ export class AppointmentService {
 		return this.userModel
 			.findOne({ _id: userId }, 'appointments')
 			.populate('appointments.location', ['_id', 'name_th', 'name_en', 'priority', 'province_th', 'province_en'])
+			.populate('appointments.vaccine')
 			.exec()
+	}
+
+	async getVaccine(id: string) {
+		return this.vaccineModel.findById(id).exec()
 	}
 }
