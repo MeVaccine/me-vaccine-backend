@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { User, UserDocument } from 'src/schema/User.schema'
 import { Appointment, AppointmentStatus } from 'src/schema/Appointment.schema'
-import { LocationDocument, VaccineName } from 'src/schema/Location.schema'
+import { LocationDocument } from 'src/schema/Location.schema'
 import { Vaccine, VaccineDocument } from 'src/schema/Vaccine.schema'
 
 @Injectable()

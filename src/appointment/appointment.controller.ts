@@ -13,15 +13,13 @@ export class AppointmentController {
 	@Post('/new')
 	@UseGuards(JwtAuthGuard)
 	async makeNewAppointment(@User() user: UserDocument, @Body() data: NewAppointmentDto) {
-		// const location = await this.locationService.findById(data.locationId)
-		// if (!location) throw new BadRequestException('Location and/or dateTime and/or vaccube is not found')
+		const location = await this.locationService.findById(data.locationId)
+		if (!location) throw new BadRequestException('Location and/or dateTime and/or vaccube is not found')
 
-		// const vaccine = await this.appointmentService.getVaccine('60c1872339fa5e71b0ca2faf')
+		await this.locationService.isValidForAppointment(data)
 
 		// await this.appointmentService.newAppointment(user, location, data.dateTime, vaccine, 1)
 		// const updatedUser = await this.appointmentService.getAllAppointment(user._id)
 		// return updatedUser.appointments
-
-		return this.locationService.isValidForAppointment(data)
 	}
 }

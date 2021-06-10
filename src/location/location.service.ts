@@ -1,6 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
-import { ObjectId } from 'mongodb'
 import { Model } from 'mongoose'
 import { NewAppointmentExceptionDto } from 'src/appointment/dto/new-appointment-exception.dto'
 import { NewAppointmentDto } from 'src/appointment/dto/new-appointment.dto'
@@ -33,6 +32,7 @@ export class LocationService {
 				{ dateTime: false }
 			)
 			.populate('vaccines.vaccine', ['name', 'minAge', 'maxAge'], this.vaccineModel)
+			.lean()
 			.exec()
 
 		if (!location)
@@ -44,19 +44,33 @@ export class LocationService {
 			)
 
 		// Count number of vaccine and check if enough
-		// const neededVaccine: Record<string, number> = {}
-		// data.person.forEach(el => {
-		// 	if (!neededVaccine[el.vaccineId]) {
-		// 		neededVaccine[el.vaccineId] = 1
-		// 	} else neededVaccine[el.vaccineId] += 1
-		// })
+		const neededVaccine: Record<string, number> = {}
+		data.person.forEach(el => {
+			if (!neededVaccine[el.vaccineId]) {
+				neededVaccine[el.vaccineId] = 1
+			} else neededVaccine[el.vaccineId] += 1
+		})
 
-		// console.log(location.vaccines)
-		// const neededVaccineCheck: Promise[] = []
-		// for (const vaccine in neededVaccine) {
-		// 	location.vaccines.findIndex(el => el.vaccine == vaccine)
-		// }
-
-		return true
+		for (const vaccine in neededVaccine) {
+			const vaccineIndex = location.vaccines.findIndex(el => el.vaccine._id.equals(vaccine))
+			// No this type of vaccine at the location
+			if (vaccineIndex === -1) {
+				throw new BadRequestException(
+					new NewAppointmentExceptionDto(
+						'Your selected vaccine is unavaliable at this location',
+						'วัคซีนท่านเลือกไม่มีที่สถานฉีดวัคซีนนี้'
+					)
+				)
+			}
+			// Have vaccine but all out
+			if (location.vaccines[vaccineIndex].avaliable < neededVaccine[vaccine]) {
+				throw new BadRequestException(
+					new NewAppointmentExceptionDto(
+						'Your selected vaccine is unavaliable at this location',
+						`${location.vaccines[vaccineIndex].vaccine.name}หมด`
+					)
+				)
+			}
+		}
 	}
 }
