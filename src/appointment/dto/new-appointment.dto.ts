@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsArray, IsDateString, IsEnum, IsMongoId } from 'class-validator'
-import { VaccineName } from 'src/schema/Location.schema'
+import { IsArray, IsDateString, IsMongoId } from 'class-validator'
 
 export class NewAppointmentDto {
 	@ApiProperty()
@@ -22,6 +21,6 @@ export class NewAppointmentPerson {
 	id: string
 
 	@ApiProperty()
-	@IsEnum(VaccineName)
-	vaccine: VaccineName
+	@IsMongoId()
+	vaccineId: string
 }

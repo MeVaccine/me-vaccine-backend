@@ -3,6 +3,7 @@ import { ApiProperty } from '@nestjs/swagger'
 import { ObjectID } from 'mongodb'
 import { Document } from 'mongoose'
 import { Location } from './Location.schema'
+import { Vaccine } from './Vaccine.schema'
 
 export type AppointmentDocument = Appointment & Document
 
@@ -22,9 +23,9 @@ export class Appointment {
 	@ApiProperty()
 	dateTime: Date
 
-	@Prop()
+	@Prop({ type: ObjectID, ref: 'Vaccine' })
 	@ApiProperty()
-	vaccine: string
+	vaccine: Vaccine
 
 	@Prop()
 	@ApiProperty()

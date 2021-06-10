@@ -1,6 +1,8 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose'
 import { ApiProperty } from '@nestjs/swagger'
 import { Document } from 'mongoose'
+import { ObjectID } from 'mongodb'
+import { Vaccine as VaccineClass } from 'src/schema/Vaccine.schema'
 
 export type LocationDocument = Location & Document
 
@@ -43,17 +45,9 @@ export class Location {
 }
 
 export class Vaccine {
-	@Prop({
-		enum: [
-			VaccineName.ASTRAZENECA,
-			VaccineName.MODERNA,
-			VaccineName.PFIZER,
-			VaccineName.SINOPHARM,
-			VaccineName.SINOVAC,
-		],
-	})
+	@Prop({ type: ObjectID, ref: 'Vaccine' })
 	@ApiProperty()
-	name: VaccineName
+	name: VaccineClass
 
 	@Prop()
 	@ApiProperty()
