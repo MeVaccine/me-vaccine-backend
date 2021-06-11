@@ -87,7 +87,7 @@ export class AppointmentController {
 		)
 
 		// TODO: Decrease number of vaccine and location capacity
-		// await this.locationService.decreaseNumberOfAvaliable(location, data.person.length, data.dateTime, neededVaccine)
+		await this.locationService.decreaseNumberOfAvaliable(location, data.person.length, data.dateTime, neededVaccine)
 
 		const appointments = await Promise.all(createAppointmentsOps)
 		return appointments.map(el => {

@@ -21,40 +21,29 @@ export class LocationService {
 			.exec()
 	}
 
-	// async decreaseNumberOfAvaliable(
-	// 	location: LocationDocument,
-	// 	personAmount: number,
-	// 	dateTime: Date,
-	// 	neededVaccine: Record<string, number>
-	// ) {
-	// 	const dateTimeIndex = location.dateTime.findIndex(el => el.startDateTime === dateTime)
-	// 	location.dateTime[dateTimeIndex].avaliable -= personAmount
+	async decreaseNumberOfAvaliable(
+		location: LocationDocument,
+		personAmount: number,
+		dateTime: Date,
+		neededVaccine: Record<string, number>
+	) {
+		const dateTimeIndex = location.dateTime.findIndex(el => el.startDateTime === dateTime)
+		const avaliable = (location.dateTime[dateTimeIndex].avaliable -= personAmount)
+		// console.log(location.dateTime[dateTimeIndex].avaliable)
 
-	// 	for (const vaccine in neededVaccine) {
-	// 		const vaccineIndex = location.vaccines.findIndex(el => {
-	// 			const currentVaccine: any = el
-	// 			// console.log(el)
-	// 			// console.log(currentVaccine._doc)
-	// 			// console.log(
-	// 			// 	currentVaccine._doc.vaccine._doc._id,
-	// 			// 	vaccine,
-	// 			// 	currentVaccine._doc.vaccine._doc._id == vaccine
-	// 			// )
-	// 			return currentVaccine._doc.vaccine._doc._id == vaccine
-	// 		})
-
-	// 		const vaccineDocument = await this.vaccineModel.findOne().lean().exec()
-	// 		// console.log(vaccineIndex)
-	// 		// const temp: any = location.vaccines[vaccineIndex]
-	// 		// console.log(Object.keys(location.vaccines[vaccineIndex]))
-	// 		// console.log(temp._doc.avaliable, typeof temp._doc.avaliable)
-	// 		// location.vaccines[vaccineIndex].avaliable = temp._doc.avaliable - neededVaccine[vaccine]
-	// 		// console.log(location)
-
-	// 		this.locationModel.updateOne({ _id: location._id, vaccines: { vaccine: vaccineDocument } })
-	// 	}
-	// 	return location.save()
-	// }
+		// for (const vaccineName in neededVaccine) {
+		// 	const vaccineIndex = location.vaccines.findIndex(el => el.name === vaccineName)
+		// 	console.log(location.vaccines[vaccineIndex].avaliable)
+		// 	location.vaccines[vaccineIndex].avaliable -= neededVaccine[vaccineName]
+		// }
+		return this.locationModel.updateOne(
+			{
+				_id: location._id,
+				dateTime: { $elemMatch: { startDateTime: dateTime } },
+			},
+			{ $set: { 'dateTime.$.avaliable': avaliable } }
+		)
+	}
 
 	async isValidForAppointment(data: NewAppointmentDto, neededVaccine: Record<string, number>) {
 		const location = await this.locationModel
