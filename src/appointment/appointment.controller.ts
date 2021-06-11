@@ -26,6 +26,7 @@ import { PersonService } from 'src/person/person.service'
 import { Appointment } from 'src/schema/Appointment.schema'
 import { UserDocument } from 'src/schema/User.schema'
 import { Vaccine, VaccineDocument } from 'src/schema/Vaccine.schema'
+import { VaccineName } from 'src/schema/VaccineLocation.schema'
 import { UserService } from 'src/user/user.service'
 import { VaccineService } from 'src/vaccine/vaccine.service'
 import { AppointmentService } from './appointment.service'
@@ -53,9 +54,9 @@ export class AppointmentController {
 		// Count number of vaccine needed
 		const neededVaccine: Record<string, number> = {}
 		data.person.forEach(el => {
-			if (!neededVaccine[el.vaccineId]) {
-				neededVaccine[el.vaccineId] = 1
-			} else neededVaccine[el.vaccineId] += 1
+			if (!neededVaccine[el.vaccine]) {
+				neededVaccine[el.vaccine] = 1
+			} else neededVaccine[el.vaccine] += 1
 		})
 		// Check if all the person select the suitable vaccine
 		const vaccines = await this.vaccineService.checkVaccinePersonValidity(data.person)
@@ -86,7 +87,7 @@ export class AppointmentController {
 		)
 
 		// TODO: Decrease number of vaccine and location capacity
-		await this.locationService.decreaseNumberOfAvaliable(location, data.person.length, data.dateTime, neededVaccine)
+		// await this.locationService.decreaseNumberOfAvaliable(location, data.person.length, data.dateTime, neededVaccine)
 
 		const appointments = await Promise.all(createAppointmentsOps)
 		return appointments.map(el => {

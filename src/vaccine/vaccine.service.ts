@@ -43,7 +43,7 @@ export class VaccineService {
 		const neededVaccines: VaccineDocument[] = []
 		for (let i = 0; i < personAppointments.length; i++) {
 			const neededVaccineIndex = vaccinableVaccine[i].findIndex(
-				vaccine => vaccine._id == personAppointments[i].vaccineId
+				vaccine => vaccine.name === personAppointments[i].vaccine
 			)
 			if (neededVaccineIndex === -1)
 				throw new BadRequestException(
