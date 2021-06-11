@@ -32,11 +32,12 @@ export class AppointmentService {
 	}
 
 	async getAllAppointment(userId: string) {
-		return this.userModel
+		const user = await this.userModel
 			.findOne({ _id: userId }, 'appointments')
 			.populate('appointments.location', ['_id', 'name_th', 'name_en', 'priority', 'province_th', 'province_en'])
 			.populate('appointments.vaccine')
 			.exec()
+		return user.appointments
 	}
 
 	async getVaccine(id: string) {

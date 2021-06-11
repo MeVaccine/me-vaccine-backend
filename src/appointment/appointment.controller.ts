@@ -1,5 +1,24 @@
-import { BadRequestException, Body, Controller, Get, HttpCode, Post, Put, Query, UseGuards } from '@nestjs/common'
-import { ApiBadRequestResponse, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger'
+import {
+	BadRequestException,
+	Body,
+	Controller,
+	Get,
+	HttpCode,
+	Post,
+	Put,
+	Query,
+	UnauthorizedException,
+	UseGuards,
+} from '@nestjs/common'
+import {
+	ApiBadRequestResponse,
+	ApiCreatedResponse,
+	ApiOkResponse,
+	ApiOperation,
+	ApiParam,
+	ApiTags,
+	ApiUnauthorizedResponse,
+} from '@nestjs/swagger'
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard'
 import { User } from 'src/decorators/user.decorator'
 import { LocationService } from 'src/location/location.service'
@@ -10,6 +29,7 @@ import { Vaccine, VaccineDocument } from 'src/schema/Vaccine.schema'
 import { UserService } from 'src/user/user.service'
 import { VaccineService } from 'src/vaccine/vaccine.service'
 import { AppointmentService } from './appointment.service'
+import { AppointmentQueryResponse } from './dto/appointment-query-res.dto'
 import { NewAppointmentExceptionDto } from './dto/new-appointment-exception.dto'
 import { NewAppointmentDto } from './dto/new-appointment.dto'
 
@@ -90,10 +110,14 @@ export class AppointmentController {
 
 	@Get()
 	@UseGuards(JwtAuthGuard)
+	@ApiOperation({ description: 'Get the appointment history' })
+	@ApiParam({ name: 'id', required: false, description: 'The ID of person to query' })
+	@ApiOkResponse({ type: AppointmentQueryResponse, isArray: true })
+	@ApiUnauthorizedResponse({ description: 'JWT token is not present or querying user that not your person' })
 	async getAppointments(@User() user: UserDocument, @Query('id') personId: string) {
 		if (!personId || user._id === personId) return this.appointmentService.getAllAppointment(user._id)
 		const isPersonOfUser = await this.personSerivce.isPersonOfUser(user._id, personId)
-		if (!isPersonOfUser) throw new BadRequestException('Your are querying user that not your person')
+		if (!isPersonOfUser) throw new UnauthorizedException('Your are querying user that not your person')
 		return this.appointmentService.getAllAppointment(personId)
 	}
 }
