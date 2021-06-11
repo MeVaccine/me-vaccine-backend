@@ -5,14 +5,6 @@ import { VaccineLocation, VaccineLocationSchema } from './VaccineLocation.schema
 
 export type LocationDocument = Location & Document
 
-export enum VaccineName {
-	SINOVAC = 'Sinovac',
-	SINOPHARM = 'Sinopharm',
-	ASTRAZENECA = 'Oxford–AstraZeneca',
-	PFIZER = 'Pfizer-BioNTech',
-	MODERNA = 'Moderna',
-}
-
 @Schema()
 export class Location {
 	@Prop()
