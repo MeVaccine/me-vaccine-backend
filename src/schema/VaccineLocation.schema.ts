@@ -1,7 +1,6 @@
-import { Prop, SchemaFactory, Schema } from '@nestjs/mongoose'
+import { Prop } from '@nestjs/mongoose'
 import { ApiProperty } from '@nestjs/swagger'
 import { Document } from 'mongoose'
-import { Vaccine } from './Vaccine.schema'
 
 export type VaccineLocationDocument = VaccineLocation & Document
 
@@ -12,7 +11,6 @@ export enum VaccineName {
 	PFIZER = 'Pfizer-BioNTech',
 	MODERNA = 'Moderna',
 }
-@Schema()
 export class VaccineLocation {
 	@Prop({
 		enum: [
@@ -34,5 +32,3 @@ export class VaccineLocation {
 	@ApiProperty()
 	avaliable: number
 }
-
-export const VaccineLocationSchema = SchemaFactory.createForClass(Vaccine)

@@ -1,7 +1,7 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose'
 import { ApiProperty } from '@nestjs/swagger'
 import { Document } from 'mongoose'
-import { VaccineLocation, VaccineLocationSchema } from './VaccineLocation.schema'
+import { VaccineLocation } from './VaccineLocation.schema'
 
 export type LocationDocument = Location & Document
 
@@ -27,7 +27,7 @@ export class Location {
 	@ApiProperty()
 	province_en: string
 
-	@Prop({ type: [{ type: VaccineLocationSchema }] })
+	@Prop()
 	@ApiProperty()
 	vaccines: VaccineLocation[]
 

@@ -1,6 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
-import { ObjectID } from 'mongodb'
 import { Model } from 'mongoose'
 import { NewAppointmentExceptionDto } from 'src/appointment/dto/new-appointment-exception.dto'
 import { NewAppointmentDto } from 'src/appointment/dto/new-appointment.dto'
@@ -31,18 +30,31 @@ export class LocationService {
 		const avaliable = (location.dateTime[dateTimeIndex].avaliable -= personAmount)
 		// console.log(location.dateTime[dateTimeIndex].avaliable)
 
-		// for (const vaccineName in neededVaccine) {
-		// 	const vaccineIndex = location.vaccines.findIndex(el => el.name === vaccineName)
-		// 	console.log(location.vaccines[vaccineIndex].avaliable)
-		// 	location.vaccines[vaccineIndex].avaliable -= neededVaccine[vaccineName]
-		// }
-		return this.locationModel.updateOne(
-			{
-				_id: location._id,
-				dateTime: { $elemMatch: { startDateTime: dateTime } },
-			},
-			{ $set: { 'dateTime.$.avaliable': avaliable } }
-		)
+		const ops: Promise<any>[] = [
+			this.locationModel
+				.updateOne(
+					{
+						_id: location._id,
+						dateTime: { $elemMatch: { startDateTime: dateTime } },
+					},
+					{ $set: { 'dateTime.$.avaliable': avaliable } }
+				)
+				.exec(),
+		]
+		for (const vaccineName in neededVaccine) {
+			const vaccineIndex = location.vaccines.findIndex(el => el.name === vaccineName)
+			const vaccine: any = location.vaccines[vaccineIndex]
+			const vaccineAvaliable = vaccine.avaliable - neededVaccine[vaccineName]
+			ops.push(
+				this.locationModel
+					.updateOne(
+						{ _id: location._id, vaccines: { $elemMatch: { name: vaccineName } } },
+						{ $set: { 'vaccines.$.avaliable': vaccineAvaliable } }
+					)
+					.exec()
+			)
+		}
+		return Promise.all(ops)
 	}
 
 	async isValidForAppointment(data: NewAppointmentDto, neededVaccine: Record<string, number>) {
