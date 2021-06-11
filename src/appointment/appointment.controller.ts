@@ -76,7 +76,9 @@ export class AppointmentController {
 
 		// TODO: Findout dose number of each user
 
-		// TODO: Check that each person is really under user
+		// Check that each person is really under user
+		const isAllUnderUser = await this.personSerivce.isPersonOfUser(user._id, users)
+		if (!isAllUnderUser) throw new UnauthorizedException()
 
 		// Create an appointment for each user
 		const createAppointmentsOps: Promise<Appointment>[] = users.map((el, index) =>
@@ -116,7 +118,8 @@ export class AppointmentController {
 	@ApiUnauthorizedResponse({ description: 'JWT token is not present or querying user that not your person' })
 	async getAppointments(@User() user: UserDocument, @Query('id') personId: string) {
 		if (!personId || user._id === personId) return this.appointmentService.getAllAppointment(user._id)
-		const isPersonOfUser = await this.personSerivce.isPersonOfUser(user._id, personId)
+		const person = await this.userService.findByID(personId)
+		const isPersonOfUser = await this.personSerivce.isPersonOfUser(user._id, [person])
 		if (!isPersonOfUser) throw new UnauthorizedException('Your are querying user that not your person')
 		return this.appointmentService.getAllAppointment(personId)
 	}
