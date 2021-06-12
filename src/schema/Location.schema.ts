@@ -1,8 +1,10 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose'
 import { ApiProperty } from '@nestjs/swagger'
 import { Document } from 'mongoose'
+import { VaccineLocation } from './VaccineLocation.schema'
 
 export type LocationDocument = Location & Document
+
 @Schema()
 export class Location {
 	@Prop()
@@ -27,25 +29,11 @@ export class Location {
 
 	@Prop()
 	@ApiProperty()
-	vaccines: Vaccine[]
+	vaccines: VaccineLocation[]
 
 	@Prop()
 	@ApiProperty()
 	dateTime: DateTime[]
-}
-
-export class Vaccine {
-	@Prop()
-	@ApiProperty()
-	name: string
-
-	@Prop()
-	@ApiProperty()
-	amount: number
-
-	@Prop()
-	@ApiProperty()
-	avaliable: number
 }
 
 export class DateTime {

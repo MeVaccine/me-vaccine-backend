@@ -3,6 +3,7 @@ import { ApiProperty } from '@nestjs/swagger'
 import { ObjectID } from 'mongodb'
 import { Document } from 'mongoose'
 import { Location } from './Location.schema'
+import { Appointment, AppointmentSchema } from './Appointment.schema'
 
 export enum GenderEN {
 	MALE = 'Male',
@@ -33,7 +34,7 @@ export class User {
 	@ApiProperty()
 	lastname_th: string
 
-	@Prop({ enum: ['ชาย', 'หญิง'] })
+	@Prop({ enum: [GenderTH.Female, GenderTH.MALE] })
 	@ApiProperty()
 	gender_th: GenderTH
 
@@ -49,7 +50,7 @@ export class User {
 	@ApiProperty()
 	lastname_en: string
 
-	@Prop({ enum: ['Male', 'Female'] })
+	@Prop({ enum: [GenderEN.Female, GenderEN.MALE] })
 	@ApiProperty()
 	gender_en: GenderEN
 
@@ -72,6 +73,10 @@ export class User {
 	@Prop({ type: [{ type: ObjectID, ref: 'User' }] })
 	@ApiProperty()
 	persons: User[]
+
+	@Prop({ type: [{ type: AppointmentSchema }] })
+	@ApiProperty()
+	appointments: Appointment[]
 }
 
 export const UserSchema = SchemaFactory.createForClass(User)
