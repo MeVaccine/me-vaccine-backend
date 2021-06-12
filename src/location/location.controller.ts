@@ -1,4 +1,4 @@
-import { Body, Controller, Get, NotFoundException, Patch, UseGuards } from '@nestjs/common'
+import { Body, Controller, Get, NotFoundException, Param, Patch, UseGuards } from '@nestjs/common'
 import {
 	ApiBadRequestResponse,
 	ApiBearerAuth,
@@ -11,9 +11,11 @@ import {
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard'
 import { User } from 'src/decorators/user.decorator'
 import { UserDocument } from 'src/schema/User.schema'
+import { VaccineLocation } from 'src/schema/VaccineLocation.schema'
 import { UserService } from 'src/user/user.service'
 import { ChangePreferedLocationDto } from './dto/change-prefered-location.dto'
 import { PreferedLocationDto } from './dto/prefered-location.dto'
+import { VaccineLocationParamDto } from './dto/vaccine-location.dto'
 import { LocationService } from './location.service'
 
 @Controller('location')
@@ -44,5 +46,16 @@ export class LocationController {
 		if (!location) throw new NotFoundException()
 		await this.userService.changePreferedLocation(user._id, location)
 		return this.userService.getPreferedLocationWithoutDatetime(user._id)
+	}
+
+	@Get('vaccines/:locationId')
+	@UseGuards(JwtAuthGuard)
+	@ApiOperation({ summary: 'Get vaccines at location' })
+	@ApiBearerAuth('Authorization')
+	@ApiOkResponse({ type: VaccineLocation, isArray: true })
+	@ApiBadRequestResponse({ description: 'locationId is not valid a Mongo ObjectId' })
+	@ApiUnauthorizedResponse({ description: 'Missing or invalid JWT token' })
+	async getLocationVaccines(@Param() { locationId }: VaccineLocationParamDto) {
+		return this.locationService.getLocationVaccines(locationId)
 	}
 }

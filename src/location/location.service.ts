@@ -20,6 +20,15 @@ export class LocationService {
 			.exec()
 	}
 
+	async getLocationVaccines(locationId: string) {
+		const location = await this.locationModel
+			.findById(locationId, 'vaccines')
+			.populate('vaccines.vaccine', ['_id', 'name', 'minAge', 'maxAge'], this.vaccineModel)
+			.lean()
+			.exec()
+		return location.vaccines
+	}
+
 	async decreaseNumberOfAvaliable(
 		location: LocationDocument,
 		personAmount: number,
