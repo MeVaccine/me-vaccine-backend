@@ -18,6 +18,7 @@ import {
 	ApiParam,
 	ApiTags,
 	ApiUnauthorizedResponse,
+	ApiBearerAuth,
 } from '@nestjs/swagger'
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard'
 import { User } from 'src/decorators/user.decorator'
@@ -50,6 +51,7 @@ export class AppointmentController {
 	@Post('new')
 	@UseGuards(JwtAuthGuard)
 	@ApiOperation({ description: 'Create new appointment' })
+	@ApiBearerAuth('Authorization')
 	@ApiCreatedResponse({ type: AppointmentQueryResponse, isArray: true })
 	@ApiBadRequestResponse({ type: NewAppointmentExceptionDto })
 	async makeNewAppointment(@User() user: UserDocument, @Body() data: NewAppointmentDto) {
@@ -109,6 +111,7 @@ export class AppointmentController {
 	@UseGuards(JwtAuthGuard)
 	@HttpCode(200)
 	@ApiOperation({ description: 'Get the vaccinable vaccine for each person' })
+	@ApiBearerAuth('Authorization')
 	@ApiOkResponse({
 		type: Vaccine,
 		isArray: true,
@@ -122,6 +125,7 @@ export class AppointmentController {
 	@Get()
 	@UseGuards(JwtAuthGuard)
 	@ApiOperation({ description: 'Get the appointment history' })
+	@ApiBearerAuth('Authorization')
 	@ApiParam({ name: 'id', required: false, description: 'The ID of person to query' })
 	@ApiOkResponse({ type: AppointmentQueryResponse, isArray: true })
 	@ApiUnauthorizedResponse({ description: 'JWT token is not present or querying user that not your person' })
@@ -136,6 +140,7 @@ export class AppointmentController {
 	@Get('next')
 	@UseGuards(JwtAuthGuard)
 	@ApiOperation({ description: 'Get user next appointment' })
+	@ApiBearerAuth('Authorization')
 	@ApiOkResponse({ type: AppointmentQueryResponse })
 	@ApiUnauthorizedResponse({ description: 'JWT token is not present or querying user that not your person' })
 	async getNextAppointment(@User() user: UserDocument) {
