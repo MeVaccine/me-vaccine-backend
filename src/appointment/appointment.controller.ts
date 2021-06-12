@@ -75,6 +75,10 @@ export class AppointmentController {
 			throw new BadRequestException(new NewAppointmentExceptionDto('Some or every User is not found', ''))
 
 		// TODO: Findout dose number of each user
+		const doesNumberOps: Promise<number>[] = data.person.map((person, index) =>
+			this.appointmentService.getVaccineDoseNumber(person.id, vaccines[index])
+		)
+		const doseNumbers = await Promise.all(doesNumberOps)
 
 		// Check that each person is really under user
 		const isAllUnderUser = await this.personSerivce.isPersonOfUser(user._id, users)
@@ -82,10 +86,10 @@ export class AppointmentController {
 
 		// Create an appointment for each user
 		const createAppointmentsOps: Promise<Appointment>[] = users.map((el, index) =>
-			this.appointmentService.newAppointment(el, location, data.dateTime, vaccines[index], 1)
+			this.appointmentService.newAppointment(el, location, data.dateTime, vaccines[index], doseNumbers[index])
 		)
 
-		// TODO: Decrease number of vaccine and location capacity
+		// Decrease number of vaccine and location capacity
 		await this.locationService.decreaseNumberOfAvaliable(location, data.person.length, data.dateTime, neededVaccine)
 
 		const appointments = await Promise.all(createAppointmentsOps)

@@ -43,4 +43,16 @@ export class AppointmentService {
 	async getVaccine(id: string) {
 		return this.vaccineModel.findById(id).exec()
 	}
+
+	async getVaccineDoseNumber(userId: string, vaccineDoc: VaccineDocument) {
+		const user = await this.userModel.findById(userId).populate('appointments.vaccine').lean().exec()
+		let doseNumber = 0
+		if (!user.appointments) return 1
+		for (const appointment of user.appointments) {
+			if (appointment.vaccine._id.equals(vaccineDoc._id)) {
+				doseNumber = appointment.doseNumber
+			}
+		}
+		return doseNumber + 1
+	}
 }
