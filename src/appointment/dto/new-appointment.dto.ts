@@ -19,7 +19,7 @@ export class NewAppointmentDto {
 	@IsDateString()
 	dateTime: Date
 
-	@ApiProperty({ type: NewAppointmentPersonDto })
+	@ApiProperty({ type: NewAppointmentPersonDto, isArray: true })
 	@IsArray()
 	person: NewAppointmentPersonDto[]
 }

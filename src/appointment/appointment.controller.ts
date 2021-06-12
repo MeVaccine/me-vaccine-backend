@@ -47,7 +47,7 @@ export class AppointmentController {
 	@Post('new')
 	@UseGuards(JwtAuthGuard)
 	@ApiOperation({ description: 'Create new appointment' })
-	@ApiCreatedResponse()
+	@ApiCreatedResponse({ type: AppointmentQueryResponse, isArray: true })
 	@ApiBadRequestResponse({ type: NewAppointmentExceptionDto })
 	async makeNewAppointment(@User() user: UserDocument, @Body() data: NewAppointmentDto) {
 		// Count number of vaccine needed
