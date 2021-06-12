@@ -32,6 +32,9 @@ import { AppointmentService } from './appointment.service'
 import { AppointmentQueryResponse } from './dto/appointment-query-res.dto'
 import { NewAppointmentExceptionDto } from './dto/new-appointment-exception.dto'
 import { NewAppointmentDto } from './dto/new-appointment.dto'
+import * as dayjs from 'dayjs'
+import * as utc from 'dayjs/plugin/utc'
+dayjs.extend(utc)
 
 @Controller('appointment')
 @ApiTags('Appointment')
@@ -94,7 +97,8 @@ export class AppointmentController {
 
 		const appointments = await Promise.all(createAppointmentsOps)
 		return appointments.map(el => {
-			const appointment = { ...el }
+			const appointment: any = { ...el }
+			appointment.dateTime = dayjs(el.dateTime).utcOffset(7).format()
 			appointment.location.dateTime = undefined
 			appointment.location.vaccines = undefined
 			return appointment
@@ -127,5 +131,14 @@ export class AppointmentController {
 		const isPersonOfUser = await this.personSerivce.isPersonOfUser(user._id, [person])
 		if (!isPersonOfUser) throw new UnauthorizedException('Your are querying user that not your person')
 		return this.appointmentService.getAllAppointment(personId)
+	}
+
+	@Get('next')
+	@UseGuards(JwtAuthGuard)
+	@ApiOperation({ description: 'Get user next appointment' })
+	@ApiOkResponse({ type: AppointmentQueryResponse })
+	@ApiUnauthorizedResponse({ description: 'JWT token is not present or querying user that not your person' })
+	async getNextAppointment(@User() user: UserDocument) {
+		return this.appointmentService.getNextAppointment(user._id)
 	}
 }

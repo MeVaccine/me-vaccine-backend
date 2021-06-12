@@ -5,6 +5,9 @@ import { User, UserDocument } from 'src/schema/User.schema'
 import { Appointment, AppointmentStatus } from 'src/schema/Appointment.schema'
 import { LocationDocument } from 'src/schema/Location.schema'
 import { Vaccine, VaccineDocument } from 'src/schema/Vaccine.schema'
+import * as dayjs from 'dayjs'
+import * as utc from 'dayjs/plugin/utc'
+dayjs.extend(utc)
 
 @Injectable()
 export class AppointmentService {
@@ -36,8 +39,32 @@ export class AppointmentService {
 			.findOne({ _id: userId }, 'appointments')
 			.populate('appointments.location', ['_id', 'name_th', 'name_en', 'priority', 'province_th', 'province_en'])
 			.populate('appointments.vaccine')
+			.lean()
 			.exec()
-		return user.appointments
+		const appointments = user.appointments.map(el => ({
+			...el,
+			dateTime: dayjs(el.dateTime).utcOffset(7).format(),
+		}))
+		console.log(appointments)
+		return appointments
+	}
+
+	async getNextAppointment(userId: string) {
+		const appointments = await this.getAllAppointment(userId)
+		if (appointments.length === 0) return {}
+
+		let nextAppointment = appointments[0]
+		const now = dayjs.utc().utcOffset(7)
+		let minDatediff = 200000000
+
+		for (const appointment of appointments) {
+			const dateDiff = dayjs(appointment.dateTime).diff(now, 'day')
+			if (appointment.status === AppointmentStatus.APPOINTED && dateDiff <= minDatediff) {
+				minDatediff = dateDiff
+				nextAppointment = appointment
+			}
+		}
+		return nextAppointment
 	}
 
 	async getVaccine(id: string) {
