@@ -45,7 +45,6 @@ export class AppointmentService {
 			...el,
 			dateTime: dayjs(el.dateTime).utcOffset(7).format(),
 		}))
-		console.log(appointments)
 		return appointments
 	}
 
