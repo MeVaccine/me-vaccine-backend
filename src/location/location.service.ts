@@ -5,7 +5,9 @@ import { NewAppointmentExceptionDto } from 'src/appointment/dto/new-appointment-
 import { NewAppointmentDto } from 'src/appointment/dto/new-appointment.dto'
 import { Location, LocationDocument } from 'src/schema/Location.schema'
 import { Vaccine, VaccineDocument } from 'src/schema/Vaccine.schema'
-
+import * as dayjs from 'dayjs'
+import * as utc from 'dayjs/plugin/utc'
+dayjs.extend(utc)
 @Injectable()
 export class LocationService {
 	constructor(
@@ -27,6 +29,12 @@ export class LocationService {
 			.lean()
 			.exec()
 		return location.vaccines
+	}
+
+	async getLocationDateTime(locationId: string, date: string) {
+		const location = await this.locationModel.findById(locationId, 'dateTime').lean().exec()
+		const dateTime = location.dateTime.filter(el => dayjs(el.startDateTime).isSame(dayjs(date), 'days'))
+		return dateTime
 	}
 
 	async decreaseNumberOfAvaliable(

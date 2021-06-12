@@ -1,4 +1,4 @@
-import { Body, Controller, Get, NotFoundException, Param, Patch, UseGuards } from '@nestjs/common'
+import { Body, Controller, Get, NotFoundException, Param, Patch, UseGuards, Query } from '@nestjs/common'
 import {
 	ApiBadRequestResponse,
 	ApiBearerAuth,
@@ -10,10 +10,12 @@ import {
 } from '@nestjs/swagger'
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard'
 import { User } from 'src/decorators/user.decorator'
+import { DateTime } from 'src/schema/Location.schema'
 import { UserDocument } from 'src/schema/User.schema'
 import { VaccineLocation } from 'src/schema/VaccineLocation.schema'
 import { UserService } from 'src/user/user.service'
 import { ChangePreferedLocationDto } from './dto/change-prefered-location.dto'
+import { DateTimeLocationQueryDto } from './dto/datetime-location.dto'
 import { PreferedLocationDto } from './dto/prefered-location.dto'
 import { VaccineLocationParamDto } from './dto/vaccine-location.dto'
 import { LocationService } from './location.service'
@@ -57,5 +59,19 @@ export class LocationController {
 	@ApiUnauthorizedResponse({ description: 'Missing or invalid JWT token' })
 	async getLocationVaccines(@Param() { locationId }: VaccineLocationParamDto) {
 		return this.locationService.getLocationVaccines(locationId)
+	}
+
+	@Get('dateTime/:locationId')
+	@UseGuards(JwtAuthGuard)
+	@ApiOperation({ summary: 'Get datetime available at location' })
+	@ApiBearerAuth('Authorization')
+	@ApiOkResponse({ type: DateTime, isArray: true })
+	@ApiBadRequestResponse({ description: 'locationId is not valid a Mongo ObjectId' })
+	@ApiUnauthorizedResponse({ description: 'Missing or invalid JWT token' })
+	async getLocationDatetime(
+		@Param() { locationId }: VaccineLocationParamDto,
+		@Query() { date }: DateTimeLocationQueryDto
+	) {
+		return this.locationService.getLocationDateTime(locationId, date)
 	}
 }
