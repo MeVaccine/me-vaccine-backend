@@ -16,6 +16,7 @@ import { VaccineLocation } from 'src/schema/VaccineLocation.schema'
 import { UserService } from 'src/user/user.service'
 import { ChangePreferedLocationDto } from './dto/change-prefered-location.dto'
 import { DateTimeLocationQueryDto } from './dto/datetime-location.dto'
+import { LocationQueryDto } from './dto/location-query.dto'
 import { PreferedLocationDto } from './dto/prefered-location.dto'
 import { VaccineLocationParamDto } from './dto/vaccine-location.dto'
 import { LocationService } from './location.service'
@@ -48,6 +49,15 @@ export class LocationController {
 		if (!location) throw new NotFoundException()
 		await this.userService.changePreferedLocation(user._id, location)
 		return this.userService.getPreferedLocationWithoutDatetime(user._id)
+	}
+
+	@Get()
+	@UseGuards(JwtAuthGuard)
+	@ApiOperation({ summary: 'Get locations & query by province' })
+	@ApiBearerAuth('Authorization')
+	@ApiOkResponse({ type: LocationQueryDto })
+	async getLocations(@Query('province') province: string) {
+		return this.locationService.findByProvince(province)
 	}
 
 	@Get('vaccines/:locationId')

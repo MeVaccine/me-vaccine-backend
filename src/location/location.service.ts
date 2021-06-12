@@ -22,6 +22,10 @@ export class LocationService {
 			.exec()
 	}
 
+	async findByProvince(province: string) {
+		return this.locationModel.find({ province_en: province }, { dateTime: false })
+	}
+
 	async getLocationVaccines(locationId: string) {
 		const location = await this.locationModel
 			.findById(locationId, 'vaccines')
