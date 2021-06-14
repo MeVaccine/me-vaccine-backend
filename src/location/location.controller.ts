@@ -52,9 +52,7 @@ export class LocationController {
 	}
 
 	@Get()
-	@UseGuards(JwtAuthGuard)
 	@ApiOperation({ summary: 'Get locations & query by province' })
-	@ApiBearerAuth('Authorization')
 	@ApiOkResponse({ type: LocationQueryDto })
 	async getLocations(@Query('province') province: string) {
 		return this.locationService.findByProvince(province)
