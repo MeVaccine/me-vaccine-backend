@@ -35,6 +35,7 @@ import { NewAppointmentExceptionDto } from './dto/new-appointment-exception.dto'
 import { NewAppointmentDto } from './dto/new-appointment.dto'
 import * as dayjs from 'dayjs'
 import * as utc from 'dayjs/plugin/utc'
+import { LandingInfoDto } from './dto/landing-info.dto'
 dayjs.extend(utc)
 
 @Controller('appointment')
@@ -137,13 +138,18 @@ export class AppointmentController {
 		return this.appointmentService.getAllAppointment(personId)
 	}
 
-	@Get('next')
+	@Get('landing')
 	@UseGuards(JwtAuthGuard)
-	@ApiOperation({ description: 'Get user next appointment' })
+	@ApiOperation({ description: 'Get user next appointment and firstname for landing screen' })
 	@ApiBearerAuth('Authorization')
-	@ApiOkResponse({ type: AppointmentQueryResponse })
+	@ApiOkResponse({ type: LandingInfoDto })
 	@ApiUnauthorizedResponse({ description: 'JWT token is not present or querying user that not your person' })
 	async getNextAppointment(@User() user: UserDocument) {
-		return this.appointmentService.getNextAppointment(user._id)
+		const nextAppointment = await this.appointmentService.getNextAppointment(user._id)
+		return {
+			firstname_th: user.firstname_th,
+			firstname_en: user.firstname_en,
+			appointment: nextAppointment,
+		}
 	}
 }
