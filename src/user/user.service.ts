@@ -66,4 +66,8 @@ export class UserService {
 			.exec()
 		return user.preferedLocation
 	}
+
+	async changePhoneNumber(userId: string, newPhoneNumber: string) {
+		return this.userModel.findByIdAndUpdate(userId, { phoneNumber: newPhoneNumber })
+	}
 }

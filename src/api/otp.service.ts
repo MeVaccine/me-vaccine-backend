@@ -1,4 +1,4 @@
-import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common'
+import { BadRequestException, CACHE_MANAGER, Inject, Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { Cache } from 'cache-manager'
 import { customAlphabet } from 'nanoid'
@@ -39,9 +39,28 @@ export class OTPService {
 		return refCode
 	}
 
+	async generateAndSentChangePhoneNumberOTP(id: string, phoneNumber: string): Promise<string> {
+		const refCode = this.nanoIdRef()
+		const otpCode = this.nanoIdOTP()
+
+		const data = JSON.stringify({ id, phoneNumber })
+		await Promise.all([
+			this.sendOTP(phoneNumber, otpCode, refCode),
+			this.cacheManager.set(otpCode, data, { ttl: 300 }),
+		])
+		return refCode
+	}
+
 	async getIdFromOTP(otpCode: string) {
 		const id = await this.cacheManager.get(otpCode)
 		await this.cacheManager.del(otpCode)
 		return id
+	}
+
+	async getIdAndPhoneNumberFromOTP(otpCode: string): Promise<any> {
+		const data: string = await this.cacheManager.get(otpCode)
+		await this.cacheManager.del(otpCode)
+		if (!data) throw new BadRequestException('OTP is not correct or expired')
+		return JSON.parse(data)
 	}
 }

@@ -8,10 +8,10 @@ import { LocationModule } from './location/location.module'
 import { MongooseModule } from '@nestjs/mongoose'
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler'
 import { APP_GUARD } from '@nestjs/core'
-import { AuthModule } from './auth/auth.module';
-import { PersonModule } from './person/person.module';
-import { AppointmentModule } from './appointment/appointment.module';
-import { VaccineModule } from './vaccine/vaccine.module';
+import { AuthModule } from './auth/auth.module'
+import { PersonModule } from './person/person.module'
+import { AppointmentModule } from './appointment/appointment.module'
+import { VaccineModule } from './vaccine/vaccine.module'
 
 @Module({
 	imports: [
@@ -25,6 +25,7 @@ import { VaccineModule } from './vaccine/vaccine.module';
 				uri: configService.get<string>('MONGODB_CONNECTION_URL'),
 				useNewUrlParser: true,
 				useUnifiedTopology: true,
+				useFindAndModify: true,
 			}),
 		}),
 		ThrottlerModule.forRoot({
