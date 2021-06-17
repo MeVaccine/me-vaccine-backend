@@ -84,8 +84,8 @@ export class AppointmentService {
 
 	async getLatestVaccinedAppointment(userId: string) {
 		const user = await this.userModel.findById(userId).populate('appointments.vaccine').lean().exec()
-		let latestAppointment = user.appointments[0]
-		if (!latestAppointment) return null
+		if (!user.appointments || !user.appointments[0]) return null
+		let latestAppointment = null
 		for (const appointment of user.appointments) {
 			if (appointment.status === AppointmentStatus.VACCINATED) latestAppointment = appointment
 		}
