@@ -22,5 +22,6 @@ import { UserModule } from 'src/user/user.module'
 	],
 	providers: [AppointmentService],
 	controllers: [AppointmentController],
+	exports: [AppointmentService],
 })
 export class AppointmentModule {}
