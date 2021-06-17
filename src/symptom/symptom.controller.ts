@@ -52,5 +52,6 @@ export class SymptomController {
 		const latestAppointment = await this.appointmentService.getLatestVaccinedAppointment(userId)
 		// Check if eligible for create new symptom assessrtment form
 		this.symptomService.isLatestAppointmentEligible(latestAppointment)
+		return this.symptomService.createNewSymptomForm(userId, symptomBody)
 	}
 }
