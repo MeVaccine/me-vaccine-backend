@@ -54,4 +54,18 @@ export class SymptomController {
 		this.symptomService.isLatestAppointmentEligible(latestAppointment)
 		return this.symptomService.createNewSymptomForm(userId, symptomBody)
 	}
+
+	@Get()
+	@UseGuards(JwtAuthGuard)
+	@ApiOperation({ summary: 'Add new symptom assessrtment form' })
+	@ApiCreatedResponse()
+	@ApiConflictResponse({ description: 'User is not allow to do the form' })
+	async getSymptomAssessmentHistory(@User() user: UserDocument, @Query() params: PersonFormDto) {
+		const userId = params.userId ? params.userId : user._id
+		if (userId !== user._id) {
+			const isPersonOfUser = await this.personService.isPersonOfUser(user._id, userId)
+			if (!isPersonOfUser) throw new UnauthorizedException('This person is not your')
+		}
+		return this.symptomService.getSymptomAssessmentHistory(userId)
+	}
 }

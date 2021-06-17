@@ -42,4 +42,10 @@ export class SymptomService {
 		user.symptomForms.push(symptomForm)
 		return user.save()
 	}
+
+	async getSymptomAssessmentHistory(userId: string) {
+		const user = await this.userModel.findById(userId, { symptomForms: 1 }).lean().exec()
+
+		return user.symptomForms ? user.symptomForms : []
+	}
 }
