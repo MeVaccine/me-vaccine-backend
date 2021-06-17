@@ -81,4 +81,14 @@ export class AppointmentService {
 		}
 		return doseNumber + 1
 	}
+
+	async getLatestVaccinedAppointment(userId: string) {
+		const user = await this.userModel.findById(userId).populate('appointments.vaccine').lean().exec()
+		let latestAppointment = user.appointments[0]
+		if (!latestAppointment) return null
+		for (const appointment of user.appointments) {
+			if (appointment.status === AppointmentStatus.VACCINATED) latestAppointment = appointment
+		}
+		return latestAppointment
+	}
 }
