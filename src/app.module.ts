@@ -12,6 +12,7 @@ import { AuthModule } from './auth/auth.module'
 import { PersonModule } from './person/person.module'
 import { AppointmentModule } from './appointment/appointment.module'
 import { VaccineModule } from './vaccine/vaccine.module'
+import { SymptomModule } from './symptom/symptom.module';
 
 @Module({
 	imports: [
@@ -39,6 +40,7 @@ import { VaccineModule } from './vaccine/vaccine.module'
 		PersonModule,
 		AppointmentModule,
 		VaccineModule,
+		SymptomModule,
 	],
 	controllers: [AppController],
 	providers: [

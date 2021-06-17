@@ -4,6 +4,7 @@ import { ObjectID } from 'mongodb'
 import { Document } from 'mongoose'
 import { Location } from './Location.schema'
 import { Appointment, AppointmentSchema } from './Appointment.schema'
+import { Symptom, SymptomSchema } from './Symptom.schema'
 
 export enum GenderEN {
 	MALE = 'Male',
@@ -77,6 +78,10 @@ export class User {
 	@Prop({ type: [{ type: AppointmentSchema }] })
 	@ApiProperty()
 	appointments: Appointment[]
+
+	@Prop({ type: [{ type: SymptomSchema }] })
+	@ApiProperty()
+	symptomForms: Symptom[]
 }
 
 export const UserSchema = SchemaFactory.createForClass(User)

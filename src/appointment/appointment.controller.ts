@@ -87,7 +87,7 @@ export class AppointmentController {
 		const doseNumbers = await Promise.all(doesNumberOps)
 
 		// Check that each person is really under user
-		const isAllUnderUser = await this.personSerivce.isPersonOfUser(user._id, users)
+		const isAllUnderUser = await this.personSerivce.isPersonsOfUser(user._id, users)
 		if (!isAllUnderUser) throw new UnauthorizedException()
 
 		// Create an appointment for each user
@@ -133,8 +133,8 @@ export class AppointmentController {
 	async getAppointments(@User() user: UserDocument, @Query('id') personId: string) {
 		if (!personId || user._id === personId) return this.appointmentService.getAllAppointment(user._id)
 		const person = await this.userService.findByID(personId)
-		const isPersonOfUser = await this.personSerivce.isPersonOfUser(user._id, [person])
-		if (!isPersonOfUser) throw new UnauthorizedException('Your are querying user that not your person')
+		const isPersonsOfUser = await this.personSerivce.isPersonsOfUser(user._id, [person])
+		if (!isPersonsOfUser) throw new UnauthorizedException('Your are querying user that not your person')
 		return this.appointmentService.getAllAppointment(personId)
 	}
 
