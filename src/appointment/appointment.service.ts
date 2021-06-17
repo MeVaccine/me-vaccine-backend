@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
-import { Model } from 'mongoose'
+import { LeanDocument, Model } from 'mongoose'
 import { User, UserDocument } from 'src/schema/User.schema'
 import { Appointment, AppointmentStatus } from 'src/schema/Appointment.schema'
 import { LocationDocument } from 'src/schema/Location.schema'
@@ -82,8 +82,13 @@ export class AppointmentService {
 		return doseNumber + 1
 	}
 
-	async getLatestVaccinedAppointment(userId: string) {
-		const user = await this.userModel.findById(userId).populate('appointments.vaccine').lean().exec()
+	async getLatestVaccinedAppointment(userId: string): Promise<LeanDocument<Appointment>> {
+		const user = await this.userModel
+			.findById(userId)
+			.populate('appointments.vaccine')
+			.populate('appointments.location')
+			.lean()
+			.exec()
 		if (!user.appointments || !user.appointments[0]) return null
 		let latestAppointment = null
 		for (const appointment of user.appointments) {
