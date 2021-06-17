@@ -9,6 +9,7 @@ import { PersonFormDto } from './dto/person-form.dto'
 import { SymptomService } from './symptom.service'
 import { AppointmentQueryResponse } from 'src/appointment/dto/appointment-query-res.dto'
 import { NewSymptomAssessmentFormDto } from './dto/new-symptom-assessment.dto'
+import { Symptom } from 'src/schema/Symptom.schema'
 
 @Controller('symptom')
 @ApiTags('Symptom Form')
@@ -57,8 +58,8 @@ export class SymptomController {
 
 	@Get()
 	@UseGuards(JwtAuthGuard)
-	@ApiOperation({ summary: 'Add new symptom assessrtment form' })
-	@ApiCreatedResponse()
+	@ApiOperation({ summary: 'Get symptom assessrtment history' })
+	@ApiOkResponse({ type: Symptom, isArray: true })
 	@ApiConflictResponse({ description: 'User is not allow to do the form' })
 	async getSymptomAssessmentHistory(@User() user: UserDocument, @Query() params: PersonFormDto) {
 		const userId = params.userId ? params.userId : user._id
