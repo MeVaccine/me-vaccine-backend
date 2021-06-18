@@ -32,6 +32,7 @@ export class SymptomController {
 			if (!isPersonOfUser) throw new UnauthorizedException('This person is not your')
 		}
 		const latestAppointment = await this.appointmentService.getLatestVaccinedAppointment(userId)
+		await this.symptomService.isLatestAssessmentFormEligible(userId)
 		return this.symptomService.isLatestAppointmentEligible(latestAppointment)
 	}
 
@@ -52,6 +53,7 @@ export class SymptomController {
 		}
 		const latestAppointment = await this.appointmentService.getLatestVaccinedAppointment(userId)
 		// Check if eligible for create new symptom assessrtment form
+		await this.symptomService.isLatestAssessmentFormEligible(userId)
 		this.symptomService.isLatestAppointmentEligible(latestAppointment)
 		return this.symptomService.createNewSymptomForm(userId, symptomBody)
 	}
