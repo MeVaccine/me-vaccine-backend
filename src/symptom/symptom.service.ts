@@ -29,6 +29,15 @@ export class SymptomService {
 		}
 	}
 
+	async isLatestAssessmentFormEligible(userId: string) {
+		const history = await this.getSymptomAssessmentHistory(userId)
+		if (history.length === 0) return
+		const now = dayjs.utc().utcOffset(7).startOf('day')
+		const historyDate = dayjs(history[history.length - 1].timestamp).startOf('day')
+		const isLongerThanDay = Math.abs(historyDate.diff(now, 'day')) >= 1
+		if (!isLongerThanDay) throw new ConflictException()
+	}
+
 	async createNewSymptomForm(userId: string, formData: NewSymptomAssessmentFormDto) {
 		const user = await this.userModel.findById(userId)
 		const symptomForm = new Symptom()
