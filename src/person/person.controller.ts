@@ -75,7 +75,7 @@ export class PersonController {
 		// Existing User
 		if (person) {
 			const refCode = await this.otpService.generatedAndSentOTP(person._id, person.phoneNumber)
-			res.status(201).send({ refCode })
+			res.status(201).send({ refCode, phoneNumber: person.phoneNumber })
 		}
 		// New User
 		res.status(200).send(personalInfo)
@@ -103,7 +103,7 @@ export class PersonController {
 		const personalInfo = await this.apiService.searchByNationalID(nationalID, laserID)
 		const person = await this.userService.createUser(personalInfo, phoneNumber, user.preferedLocation)
 		const refCode = await this.otpService.generatedAndSentOTP(person._id, person.phoneNumber)
-		return { refCode }
+		return { refCode, phoneNumber: person.phoneNumber }
 	}
 
 	@Get('add/verify')
