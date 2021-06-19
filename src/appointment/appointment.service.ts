@@ -41,6 +41,7 @@ export class AppointmentService {
 			.populate('appointments.vaccine')
 			.lean()
 			.exec()
+		if (!user.appointments) return []
 		const appointments = user.appointments.map(el => ({
 			...el,
 			dateTime: dayjs(el.dateTime).utcOffset(7).format(),
