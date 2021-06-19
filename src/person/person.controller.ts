@@ -75,10 +75,10 @@ export class PersonController {
 		// Existing User
 		if (person) {
 			const refCode = await this.otpService.generatedAndSentOTP(person._id, person.phoneNumber)
-			res.status(201).send({ refCode, phoneNumber: person.phoneNumber })
+			return res.status(201).send({ refCode, phoneNumber: person.phoneNumber })
 		}
 		// New User
-		res.status(200).send(personalInfo)
+		return res.status(200).send(personalInfo)
 	}
 
 	@Post('add/regis')
