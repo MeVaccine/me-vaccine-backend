@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { LeanDocument, Model } from 'mongoose'
 import { User, UserDocument } from 'src/schema/User.schema'
@@ -96,5 +96,15 @@ export class AppointmentService {
 			if (appointment.status === AppointmentStatus.VACCINATED) latestAppointment = appointment
 		}
 		return latestAppointment
+	}
+
+	async getLatestAppointedAppointment(userId: string, dateTime: Date) {
+		const user = await this.getAllAppointment(userId)
+		const formatedDateTime = dayjs(dateTime)
+		const appointment = user.find(
+			ele => ele.status === AppointmentStatus.APPOINTED && dayjs(ele.dateTime).isSame(formatedDateTime, 'day')
+		)
+		if (!appointment) throw new BadRequestException('No Appointment to be vaccinated')
+		return appointment
 	}
 }
