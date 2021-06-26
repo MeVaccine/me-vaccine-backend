@@ -22,6 +22,10 @@ export class Vaccine {
 	@Prop({ required: false })
 	@ApiProperty()
 	maxAge: number
+
+	@Prop()
+	@ApiProperty()
+	duration: number
 }
 
 export const VaccineSchema = SchemaFactory.createForClass(Vaccine)

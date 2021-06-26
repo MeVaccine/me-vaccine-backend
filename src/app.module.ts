@@ -13,6 +13,7 @@ import { PersonModule } from './person/person.module'
 import { AppointmentModule } from './appointment/appointment.module'
 import { VaccineModule } from './vaccine/vaccine.module'
 import { SymptomModule } from './symptom/symptom.module';
+import { ExternalModule } from './external/external.module';
 
 @Module({
 	imports: [
@@ -41,6 +42,7 @@ import { SymptomModule } from './symptom/symptom.module';
 		AppointmentModule,
 		VaccineModule,
 		SymptomModule,
+		ExternalModule,
 	],
 	controllers: [AppController],
 	providers: [

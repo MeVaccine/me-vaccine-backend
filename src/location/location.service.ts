@@ -22,6 +22,16 @@ export class LocationService {
 			.exec()
 	}
 
+	findByEnName(name: string) {
+		return (
+			this.locationModel
+				.findOne({ name_en: name })
+				.populate('vaccines.vaccine', ['_id', 'name', 'minAge', 'maxAge'], this.vaccineModel)
+				// .lean()
+				.exec()
+		)
+	}
+
 	async findByProvince(province: string) {
 		return this.locationModel.find({ province_en: province }, { dateTime: false })
 	}
@@ -47,16 +57,16 @@ export class LocationService {
 		dateTime: Date,
 		neededVaccine: Record<string, number>
 	) {
-		const dateTimeIndex = location.dateTime.findIndex(el => el.startDateTime === dateTime)
+		const dateTimeIndex = location.dateTime.findIndex(el => dayjs(el.startDateTime).isSame(dateTime, 'day'))
+		console.log(dateTimeIndex, location.dateTime[dateTimeIndex])
 		const avaliable = (location.dateTime[dateTimeIndex].avaliable -= personAmount)
-		// console.log(location.dateTime[dateTimeIndex].avaliable)
 
 		const ops: Promise<any>[] = [
 			this.locationModel
 				.updateOne(
 					{
 						_id: location._id,
-						dateTime: { $elemMatch: { startDateTime: dateTime } },
+						dateTime: { $elemMatch: { startDateTime: dayjs(dateTime).format() } },
 					},
 					{ $set: { 'dateTime.$.avaliable': avaliable } }
 				)
@@ -76,6 +86,25 @@ export class LocationService {
 			)
 		}
 		return Promise.all(ops)
+	}
+
+	async isValidForVaccinateAppointment(locationName: string, neededVaccine: string, dateTime: string) {
+		const location = await this.locationModel
+			.findOne(
+				{
+					name_en: locationName,
+					dateTime: {
+						$elemMatch: { startDateTime: dateTime, avaliable: { $gte: 1 } },
+					},
+				},
+				{ dateTime: false }
+			)
+			.populate('vaccines.vaccine', ['name', 'minAge', 'maxAge'], this.vaccineModel)
+			.lean()
+			.exec()
+		const vaccineAtLocation = location.vaccines.findIndex(el => el.name === neededVaccine)
+		if (vaccineAtLocation === -1) throw new BadRequestException()
+		if (location.vaccines[vaccineAtLocation].avaliable < 1) throw new BadRequestException()
 	}
 
 	async isValidForAppointment(data: NewAppointmentDto, neededVaccine: Record<string, number>) {

@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { LeanDocument, Model } from 'mongoose'
 import { User, UserDocument } from 'src/schema/User.schema'
 import { Appointment, AppointmentStatus } from 'src/schema/Appointment.schema'
-import { LocationDocument } from 'src/schema/Location.schema'
+import { Location } from 'src/schema/Location.schema'
 import { Vaccine, VaccineDocument } from 'src/schema/Vaccine.schema'
 import * as dayjs from 'dayjs'
 import * as utc from 'dayjs/plugin/utc'
@@ -16,17 +16,11 @@ export class AppointmentService {
 		@InjectModel(Vaccine.name) private vaccineModel: Model<VaccineDocument>
 	) {}
 
-	async newAppointment(
-		user: UserDocument,
-		locationId: LocationDocument,
-		dateTime: Date,
-		vaccine: VaccineDocument,
-		doseNumber: number
-	) {
+	async newAppointment(user: UserDocument, location: Location, dateTime: Date, vaccine: Vaccine, doseNumber: number) {
 		const appointment = new Appointment()
 		appointment.dateTime = dateTime
 		appointment.doseNumber = doseNumber
-		appointment.location = locationId
+		appointment.location = location
 		appointment.status = AppointmentStatus.APPOINTED
 		appointment.vaccine = vaccine
 		user.appointments.push(appointment)
@@ -96,5 +90,15 @@ export class AppointmentService {
 			if (appointment.status === AppointmentStatus.VACCINATED) latestAppointment = appointment
 		}
 		return latestAppointment
+	}
+
+	async getLatestAppointedAppointment(userId: string, dateTime: Date) {
+		const user = await this.getAllAppointment(userId)
+		const formatedDateTime = dayjs(dateTime)
+		const appointment = user.find(
+			ele => ele.status === AppointmentStatus.APPOINTED && dayjs(ele.dateTime).isSame(formatedDateTime, 'day')
+		)
+		if (!appointment) throw new BadRequestException('No Appointment to be vaccinated')
+		return appointment
 	}
 }
