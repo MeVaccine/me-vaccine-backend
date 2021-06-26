@@ -36,5 +36,10 @@ export class ExternalController {
 			appointment.vaccine,
 			appointment.doseNumber + 1
 		)
+
+		const location = await this.locationService.findByEnName(appointment.location.name_en)
+		const neededVaccines = {}
+		neededVaccines[appointment.vaccine.name] = 1
+		return this.locationService.decreaseNumberOfAvaliable(location, 1, nextDoseDateTime.toDate(), neededVaccines)
 	}
 }

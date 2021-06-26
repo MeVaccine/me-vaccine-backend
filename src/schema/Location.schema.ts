@@ -8,9 +8,9 @@ export type LocationDocument = Location & Document
 
 @Schema()
 export class Location {
-	@Prop({ type: ObjectID })
-	@ApiProperty()
-	_id: ObjectID
+	// @Prop({ type: ObjectID })
+	// @ApiProperty()
+	// _id: ObjectID
 
 	@Prop()
 	@ApiProperty()
