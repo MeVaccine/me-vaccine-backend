@@ -53,6 +53,7 @@ export class PersonService {
 	async isPersonsOfUser(userId: string, persons: UserDocument[]): Promise<boolean> {
 		const userIndex = persons.findIndex(el => el._id === userId)
 		if (userIndex !== -1) persons.splice(userIndex, 1)
+		if (persons.length === 0) return true
 		const person = await this.userModel.findOne({ _id: userId, persons: { $in: persons } })
 		return person ? true : false
 	}
