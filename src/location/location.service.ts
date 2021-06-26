@@ -78,10 +78,7 @@ export class LocationService {
 		return Promise.all(ops)
 	}
 
-	async isValidForVaccinateAppointment(locationName: string, neededVaccine: string, dateTime: Date) {
-		console.log(locationName)
-		console.log(neededVaccine)
-		console.log(dateTime.toISOString())
+	async isValidForVaccinateAppointment(locationName: string, neededVaccine: string, dateTime: string) {
 		const location = await this.locationModel
 			.findOne(
 				{
@@ -95,7 +92,6 @@ export class LocationService {
 			.populate('vaccines.vaccine', ['name', 'minAge', 'maxAge'], this.vaccineModel)
 			.lean()
 			.exec()
-		console.log(location)
 		const vaccineAtLocation = location.vaccines.findIndex(el => el.name === neededVaccine)
 		if (vaccineAtLocation === -1) throw new BadRequestException()
 		if (location.vaccines[vaccineAtLocation].avaliable < 1) throw new BadRequestException()

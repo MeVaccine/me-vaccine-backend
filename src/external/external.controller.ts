@@ -12,13 +12,11 @@ export class ExternalController {
 	@Post('vaccinated')
 	async vaccinateUser(@Body() { userId, dateTime }: VaccinateUserDto) {
 		const appointment = await this.appointmentService.getLatestAppointedAppointment(userId, dateTime)
-		// console.log(appointment)
-		// console.log(appointment.vaccine)
-		console.log(appointment.vaccine.name)
+		const nextDoseDateTime = dayjs(appointment.dateTime).add(3, 'week')
 		await this.locationService.isValidForVaccinateAppointment(
 			appointment.location.name_en,
 			appointment.vaccine.name,
-			dayjs(appointment.dateTime).toDate()
+			nextDoseDateTime.format()
 		)
 	}
 }
