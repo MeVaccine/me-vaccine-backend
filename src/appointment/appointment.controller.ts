@@ -87,7 +87,7 @@ export class AppointmentController {
 		const doseNumbers = await Promise.all(doesNumberOps)
 
 		// Check that each person is really under user
-		const isAllUnderUser = await this.personSerivce.isPersonsOfUser(user._id, users)
+		const isAllUnderUser = await this.personSerivce.isPersonsOfUser(user._id.toHexString(), users)
 		if (!isAllUnderUser) throw new UnauthorizedException()
 
 		// Create an appointment for each user
