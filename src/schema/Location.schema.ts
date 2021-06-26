@@ -1,5 +1,6 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose'
 import { ApiProperty } from '@nestjs/swagger'
+import { ObjectID } from 'mongodb'
 import { Document } from 'mongoose'
 import { VaccineLocation } from './VaccineLocation.schema'
 
@@ -7,6 +8,10 @@ export type LocationDocument = Location & Document
 
 @Schema()
 export class Location {
+	@Prop({ type: ObjectID })
+	@ApiProperty()
+	_id: ObjectID
+
 	@Prop()
 	@ApiProperty()
 	name_th: string
