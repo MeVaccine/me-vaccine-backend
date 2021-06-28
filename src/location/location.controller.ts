@@ -82,4 +82,15 @@ export class LocationController {
 	) {
 		return this.locationService.getLocationDateTime(locationId, date)
 	}
+
+	@Get('datetime/earliest/:locationId')
+	@UseGuards(JwtAuthGuard)
+	@ApiOperation({ summary: 'Get earliest avaliable dateTime at the location' })
+	@ApiBearerAuth('Authorization')
+	@ApiOkResponse({ type: DateTime, isArray: true })
+	@ApiBadRequestResponse({ description: 'locationId is not valid a Mongo ObjectId' })
+	@ApiUnauthorizedResponse({ description: 'Missing or invalid JWT token' })
+	async getEarliestLocationDatetime(@Param() { locationId }: VaccineLocationParamDto) {
+		return this.locationService.getEarliestAvaliableDateTime(locationId)
+	}
 }
