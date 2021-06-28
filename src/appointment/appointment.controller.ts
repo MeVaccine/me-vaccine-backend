@@ -147,8 +147,8 @@ export class AppointmentController {
 	async getNextAppointment(@User() user: UserDocument) {
 		const nextAppointment = await this.appointmentService.getNextAppointment(user._id)
 		return {
-			firstname_th: user.firstname_th,
-			firstname_en: user.firstname_en,
+			...user.toObject(),
+			id: user._id,
 			appointment: nextAppointment,
 		}
 	}
