@@ -101,4 +101,16 @@ export class AppointmentService {
 		if (!appointment) throw new BadRequestException('No Appointment to be vaccinated')
 		return appointment
 	}
+
+	async updateAppointmentStatus(userId: string, dateTime: Date, status: AppointmentStatus) {
+		return this.userModel
+			.updateOne(
+				{
+					_id: userId,
+					appointments: { $elemMatch: { dateTime: dateTime, status: AppointmentStatus.APPOINTED } },
+				},
+				{ $set: { 'appointments.$.status': status } }
+			)
+			.exec()
+	}
 }
