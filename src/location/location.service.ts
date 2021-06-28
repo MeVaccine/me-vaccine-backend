@@ -51,6 +51,16 @@ export class LocationService {
 		return dateTime
 	}
 
+	async getEarliestAvaliableDateTime(locationId: string) {
+		const location = await this.locationModel.findById(locationId, 'dateTime').lean().exec()
+		const earliestDateTime = location.dateTime.find(el => el.avaliable !== 0)
+		if (!earliestDateTime) return []
+		const dateTime = location.dateTime.filter(el =>
+			dayjs(el.startDateTime).isSame(dayjs(earliestDateTime.startDateTime), 'days')
+		)
+		return dateTime
+	}
+
 	async decreaseNumberOfAvaliable(
 		location: LocationDocument,
 		personAmount: number,
