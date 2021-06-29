@@ -67,21 +67,20 @@ export class LocationService {
 		dateTime: Date,
 		neededVaccine: Record<string, number>
 	) {
-		const dateTimeIndex = location.dateTime.findIndex(el => dayjs(el.startDateTime).isSame(dateTime, 'day'))
+		const dateTimeIndex = location.dateTime.findIndex(el => dayjs(el.startDateTime).isSame(dateTime))
 		const avaliable = location.dateTime[dateTimeIndex].avaliable - personAmount
-		console.log(location.dateTime[dateTimeIndex].avaliable)
-		console.log(avaliable)
 		const ops: Promise<any>[] = [
 			this.locationModel
 				.updateOne(
 					{
 						_id: location._id,
-						dateTime: { $elemMatch: { startDateTime: dayjs(dateTime).format() } },
+						dateTime: { $elemMatch: { startDateTime: dateTime } },
 					},
 					{ $set: { 'dateTime.$.avaliable': avaliable } }
 				)
 				.exec(),
 		]
+
 		for (const vaccineName in neededVaccine) {
 			const vaccineIndex = location.vaccines.findIndex(el => el.name === vaccineName)
 			const vaccine: any = location.vaccines[vaccineIndex]
@@ -120,18 +119,7 @@ export class LocationService {
 	async isValidForAppointment(data: NewAppointmentDto, neededVaccine: Record<string, number>) {
 		console.log(dayjs(data.dateTime).format())
 		const location = await this.locationModel
-			.findOne(
-				{
-					_id: data.locationId,
-					// dateTime: {
-					// 	$elemMatch: {
-					// 		startDateTime: dayjs(data.dateTime).format(),
-					// 		avaliable: { $gte: data.person.length },
-					// 	},
-					// },
-				}
-				// { dateTime: false }
-			)
+			.findById(data.locationId)
 			.populate('vaccines.vaccine', ['name', 'minAge', 'maxAge'], this.vaccineModel)
 			.lean()
 			.exec()
