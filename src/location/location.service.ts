@@ -69,12 +69,16 @@ export class LocationService {
 	) {
 		const dateTimeIndex = location.dateTime.findIndex(el => dayjs(el.startDateTime).isSame(dateTime))
 		const avaliable = location.dateTime[dateTimeIndex].avaliable - personAmount
+		console.log(dateTime)
+		console.log(dayjs.utc(dateTime).utcOffset(7).format())
+		console.log(location.dateTime[dateTimeIndex].avaliable)
+		console.log(avaliable)
 		const ops: Promise<any>[] = [
 			this.locationModel
 				.updateOne(
 					{
 						_id: location._id,
-						dateTime: { $elemMatch: { startDateTime: dateTime } },
+						dateTime: { $elemMatch: { startDateTime: dayjs.utc(dateTime).utcOffset(7).format() } },
 					},
 					{ $set: { 'dateTime.$.avaliable': avaliable } }
 				)
@@ -122,7 +126,6 @@ export class LocationService {
 	}
 
 	async isValidForAppointment(data: NewAppointmentDto, neededVaccine: Record<string, number>) {
-		console.log(dayjs(data.dateTime).format())
 		const location = await this.locationModel
 			.findById(data.locationId)
 			.populate('vaccines.vaccine', ['name', 'minAge', 'maxAge'], this.vaccineModel)
