@@ -10,6 +10,7 @@ export class AppController {
 		return {
 			success: true,
 			timestamp: this.appService.getTimestamp(),
+			version: '0.1',
 		}
 	}
 }
