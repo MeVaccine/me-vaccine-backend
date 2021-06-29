@@ -68,7 +68,6 @@ export class LocationService {
 		neededVaccine: Record<string, number>
 	) {
 		const dateTimeIndex = location.dateTime.findIndex(el => dayjs(el.startDateTime).isSame(dateTime, 'day'))
-		console.log(dateTimeIndex, location.dateTime[dateTimeIndex])
 		const avaliable = (location.dateTime[dateTimeIndex].avaliable -= personAmount)
 
 		const ops: Promise<any>[] = [
