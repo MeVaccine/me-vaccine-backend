@@ -68,7 +68,6 @@ export class LocationService {
 		neededVaccine: Record<string, number>
 	) {
 		const dateTimeIndex = location.dateTime.findIndex(el => dayjs(el.startDateTime).isSame(dateTime, 'day'))
-		console.log(dateTimeIndex, location.dateTime[dateTimeIndex])
 		const avaliable = (location.dateTime[dateTimeIndex].avaliable -= personAmount)
 
 		const ops: Promise<any>[] = [
@@ -123,7 +122,10 @@ export class LocationService {
 				{
 					_id: data.locationId,
 					dateTime: {
-						$elemMatch: { startDateTime: data.dateTime, avaliable: { $gte: data.person.length } },
+						$elemMatch: {
+							startDateTime: dayjs(data.dateTime).format(),
+							avaliable: { $gte: data.person.length },
+						},
 					},
 				},
 				{ dateTime: false }

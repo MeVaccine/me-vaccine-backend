@@ -37,7 +37,6 @@ export class PersonService {
 		const persons = await this.userModel
 			.aggregate([{ $match: { _id: userId } }, { $project: { count: { $size: '$persons' } } }])
 			.exec()
-		console.log(persons)
 		return persons[0].count
 	}
 
