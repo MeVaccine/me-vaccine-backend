@@ -112,8 +112,9 @@ export class LocationService {
 			.lean()
 			.exec()
 		const vaccineAtLocation = location.vaccines.findIndex(el => el.name === neededVaccine)
-		if (vaccineAtLocation === -1) throw new BadRequestException()
-		if (location.vaccines[vaccineAtLocation].avaliable < 1) throw new BadRequestException()
+		if (vaccineAtLocation === -1) throw new BadRequestException('No Vaccine Found')
+		if (location.vaccines[vaccineAtLocation].avaliable < 1)
+			throw new BadRequestException('Vaccine is not avaliable')
 	}
 
 	async isValidForAppointment(data: NewAppointmentDto, neededVaccine: Record<string, number>) {
