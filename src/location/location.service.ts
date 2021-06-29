@@ -67,6 +67,7 @@ export class LocationService {
 		dateTime: Date,
 		neededVaccine: Record<string, number>
 	) {
+		// TODO: Check with ISO string of flutter
 		const dateTimeIndex = location.dateTime.findIndex(el => dayjs(el.startDateTime).isSame(dateTime))
 		const avaliable = location.dateTime[dateTimeIndex].avaliable - personAmount
 		console.log(dateTime)
