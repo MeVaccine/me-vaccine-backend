@@ -102,15 +102,20 @@ export class LocationService {
 			.findOne(
 				{
 					name_en: locationName,
-					dateTime: {
-						$elemMatch: { startDateTime: dateTime, avaliable: { $gte: 1 } },
-					},
-				},
-				{ dateTime: false }
+					// dateTime: {
+					// 	$elemMatch: { startDateTime: dayjs(dateTime).format(), avaliable: { $gte: 1 } },
+					// },
+				}
+				// { dateTime: false }
 			)
 			.populate('vaccines.vaccine', ['name', 'minAge', 'maxAge'], this.vaccineModel)
 			.lean()
 			.exec()
+		const isDateTimeAvaliable = location.dateTime.find(
+			el => dayjs(el.startDateTime).isSame(dayjs(dateTime), 'millisecond') && el.avaliable >= 1
+		)
+		if (!isDateTimeAvaliable) throw new BadRequestException('Not avaliable at this time')
+
 		const vaccineAtLocation = location.vaccines.findIndex(el => el.name === neededVaccine)
 		if (vaccineAtLocation === -1) throw new BadRequestException()
 		if (location.vaccines[vaccineAtLocation].avaliable < 1) throw new BadRequestException()
