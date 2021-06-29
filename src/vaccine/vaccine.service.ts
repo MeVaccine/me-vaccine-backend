@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
-import { Model } from 'mongoose'
+import { FilterQuery, Model } from 'mongoose'
 import { NewAppointmentPersonDto } from 'src/appointment/dto/new-appointment.dto'
 import { Vaccine, VaccineDocument } from 'src/schema/Vaccine.schema'
 import { UserService } from 'src/user/user.service'
@@ -22,16 +22,20 @@ export class VaccineService {
 		return this.vaccineModel.find().lean().exec()
 	}
 
-	async getVaccinableVaccine(userId: string) {
+	async getVaccinableVaccine(userId: string, vaccineFilter?: string[]) {
 		const user = await this.userService.findByID(userId)
 		const now = dayjs.utc().utcOffset(7)
 		const age = now.diff(dayjs(user.dateOfBirth), 'year')
+		const findCondition: FilterQuery<VaccineDocument> = {
+			minAge: { $lte: age },
+			$or: [{ maxAge: undefined }, { maxAge: { $gte: age } }],
+		}
+		if (vaccineFilter) {
+			findCondition.name = { $in: vaccineFilter }
+		}
 		return (
 			this.vaccineModel
-				.find({ minAge: { $lte: age }, $or: [{ maxAge: undefined }, { maxAge: { $gte: age } }] }, [
-					'_id',
-					'name',
-				])
+				.find(findCondition, ['_id', 'name'])
 				// .lean()
 				.exec()
 		)
