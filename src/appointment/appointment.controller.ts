@@ -4,6 +4,7 @@ import {
 	Controller,
 	Get,
 	HttpCode,
+	Param,
 	Post,
 	Put,
 	Query,
@@ -36,6 +37,7 @@ import { NewAppointmentDto } from './dto/new-appointment.dto'
 import * as dayjs from 'dayjs'
 import * as utc from 'dayjs/plugin/utc'
 import { LandingInfoDto } from './dto/landing-info.dto'
+import { VaccineLocationParamDto } from 'src/location/dto/vaccine-location.dto'
 dayjs.extend(utc)
 
 @Controller('appointment')
@@ -108,7 +110,7 @@ export class AppointmentController {
 		})
 	}
 
-	@Put('vaccine')
+	@Put('vaccine/:locationId')
 	@UseGuards(JwtAuthGuard)
 	@HttpCode(200)
 	@ApiOperation({ description: 'Get the vaccinable vaccine for each person' })
@@ -118,8 +120,14 @@ export class AppointmentController {
 		isArray: true,
 		description: 'The actual response is array (person) of array of vaccine',
 	})
-	async getVaccinableVaccine(@Body() ids: string[]) {
-		const ops: Promise<VaccineDocument[]>[] = ids.map(id => this.vaccineService.getVaccinableVaccine(id))
+	async getVaccinableVaccine(@Body() ids: string[], @Param() { locationId }: VaccineLocationParamDto) {
+		const vaccines = await this.locationService.getLocationVaccines(locationId)
+		const ops: Promise<VaccineDocument[]>[] = ids.map(id =>
+			this.vaccineService.getVaccinableVaccine(
+				id,
+				vaccines.map(el => el.name)
+			)
+		)
 		return Promise.all(ops)
 	}
 
