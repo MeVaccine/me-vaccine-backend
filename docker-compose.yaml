@@ -1,0 +1,10 @@
+version: '3'
+services: 
+    backend:
+        # image: asia.gcr.io/macbigduck/me-vaccine-backend/me-vaccine-backend@sha256:bda7b63323bd481e32c299bfbff85c53ad122403220212ce908d46e04e8bfb8f
+        build: 
+            context: .
+            dockerfile: Dockerfile
+        env_file: .env
+        ports: 
+            - 8000:8080

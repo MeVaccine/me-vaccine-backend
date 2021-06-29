@@ -68,8 +68,9 @@ export class LocationService {
 		neededVaccine: Record<string, number>
 	) {
 		const dateTimeIndex = location.dateTime.findIndex(el => dayjs(el.startDateTime).isSame(dateTime, 'day'))
-		const avaliable = (location.dateTime[dateTimeIndex].avaliable -= personAmount)
-
+		const avaliable = location.dateTime[dateTimeIndex].avaliable - personAmount
+		console.log(location.dateTime[dateTimeIndex].avaliable)
+		console.log(avaliable)
 		const ops: Promise<any>[] = [
 			this.locationModel
 				.updateOne(
@@ -117,24 +118,31 @@ export class LocationService {
 	}
 
 	async isValidForAppointment(data: NewAppointmentDto, neededVaccine: Record<string, number>) {
+		console.log(dayjs(data.dateTime).format())
 		const location = await this.locationModel
 			.findOne(
 				{
 					_id: data.locationId,
-					dateTime: {
-						$elemMatch: {
-							startDateTime: dayjs(data.dateTime).format(),
-							avaliable: { $gte: data.person.length },
-						},
-					},
-				},
-				{ dateTime: false }
+					// dateTime: {
+					// 	$elemMatch: {
+					// 		startDateTime: dayjs(data.dateTime).format(),
+					// 		avaliable: { $gte: data.person.length },
+					// 	},
+					// },
+				}
+				// { dateTime: false }
 			)
 			.populate('vaccines.vaccine', ['name', 'minAge', 'maxAge'], this.vaccineModel)
 			.lean()
 			.exec()
 
-		if (!location)
+		const isDateTimeAvaliable = location.dateTime.find(
+			dateTime =>
+				dayjs(dateTime.startDateTime).isSame(dayjs(data.dateTime), 'millisecond') &&
+				dateTime.avaliable >= data.person.length
+		)
+
+		if (!location || !isDateTimeAvaliable)
 			throw new BadRequestException(
 				new NewAppointmentExceptionDto(
 					`Your selected date and time is not avaliable for ${data.person.length} person`,
