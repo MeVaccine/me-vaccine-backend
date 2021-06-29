@@ -123,7 +123,10 @@ export class LocationService {
 				{
 					_id: data.locationId,
 					dateTime: {
-						$elemMatch: { startDateTime: data.dateTime, avaliable: { $gte: data.person.length } },
+						$elemMatch: {
+							startDateTime: dayjs(data.dateTime).format(),
+							avaliable: { $gte: data.person.length },
+						},
 					},
 				},
 				{ dateTime: false }
