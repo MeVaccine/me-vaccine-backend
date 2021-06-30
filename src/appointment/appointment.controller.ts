@@ -121,7 +121,7 @@ export class AppointmentController {
 		description: 'The actual response is array (person) of array of vaccine',
 	})
 	async getVaccinableVaccine(@Body() ids: string[], @Param() { locationId }: VaccineLocationParamDto) {
-		const vaccines = await this.locationService.getLocationVaccines(locationId)
+		const vaccines = await this.locationService.getLocationVaccines(locationId, true)
 		const ops: Promise<VaccineDocument[]>[] = ids.map(id =>
 			this.vaccineService.getVaccinableVaccine(
 				id,
