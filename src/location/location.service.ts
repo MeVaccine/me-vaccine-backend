@@ -36,13 +36,13 @@ export class LocationService {
 		return this.locationModel.find({ province_en: province }, { dateTime: false })
 	}
 
-	async getLocationVaccines(locationId: string) {
+	async getLocationVaccines(locationId: string, onlyAvailable = false) {
 		const location = await this.locationModel
 			.findById(locationId, 'vaccines')
 			.populate('vaccines.vaccine', ['_id', 'name', 'minAge', 'maxAge'], this.vaccineModel)
 			.lean()
 			.exec()
-		return location.vaccines
+		return onlyAvailable ? location.vaccines.filter(el => el.avaliable > 0) : location.vaccines
 	}
 
 	async getLocationDateTime(locationId: string, date: string) {
