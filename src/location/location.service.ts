@@ -67,7 +67,7 @@ export class LocationService {
 		dateTime: Date,
 		neededVaccine: Record<string, number>
 	) {
-		const dateTimeIndex = location.dateTime.findIndex(el => dayjs(el.startDateTime).isSame(dateTime, 'day'))
+		const dateTimeIndex = location.dateTime.findIndex(el => dayjs(el.startDateTime).isSame(dateTime))
 		const avaliable = (location.dateTime[dateTimeIndex].avaliable -= personAmount)
 
 		const ops: Promise<any>[] = [
@@ -75,7 +75,7 @@ export class LocationService {
 				.updateOne(
 					{
 						_id: location._id,
-						dateTime: { $elemMatch: { startDateTime: dayjs(dateTime).format() } },
+						dateTime: { $elemMatch: { startDateTime: dayjs.utc(dateTime).utcOffset(7).format() } },
 					},
 					{ $set: { 'dateTime.$.avaliable': avaliable } }
 				)
@@ -103,7 +103,10 @@ export class LocationService {
 				{
 					name_en: locationName,
 					dateTime: {
-						$elemMatch: { startDateTime: dateTime, avaliable: { $gte: 1 } },
+						$elemMatch: {
+							startDateTime: dayjs.utc(dateTime).utcOffset(7).format(),
+							avaliable: { $gte: 1 },
+						},
 					},
 				},
 				{ dateTime: false }
@@ -124,7 +127,7 @@ export class LocationService {
 					_id: data.locationId,
 					dateTime: {
 						$elemMatch: {
-							startDateTime: dayjs(data.dateTime).format(),
+							startDateTime: dayjs.utc(data.dateTime).utcOffset(7).format(),
 							avaliable: { $gte: data.person.length },
 						},
 					},
