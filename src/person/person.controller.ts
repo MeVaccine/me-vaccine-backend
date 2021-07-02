@@ -1,4 +1,16 @@
-import { BadRequestException, Body, Controller, Delete, Get, Param, Post, Query, Res, UseGuards } from '@nestjs/common'
+import {
+	BadRequestException,
+	Body,
+	ConflictException,
+	Controller,
+	Delete,
+	Get,
+	Param,
+	Post,
+	Query,
+	Res,
+	UseGuards,
+} from '@nestjs/common'
 import {
 	ApiBadRequestResponse,
 	ApiBearerAuth,
@@ -74,6 +86,8 @@ export class PersonController {
 		const person = await this.userService.findByNationalIDAndVerified(nationalID)
 		// Existing User
 		if (person) {
+			const isAlreadyAdd = await this.personService.isPersonOfUser(user._id, person._id)
+			if (isAlreadyAdd) throw new ConflictException('User already in the person')
 			const refCode = await this.otpService.generatedAndSentOTP(person._id, person.phoneNumber)
 			return res.status(201).send({ refCode, phoneNumber: person.phoneNumber })
 		}
@@ -101,7 +115,10 @@ export class PersonController {
 		if (isExceeded) throw new BadRequestException('5 Person limit is reached')
 
 		const personalInfo = await this.apiService.searchByNationalID(nationalID, laserID)
-		const person = await this.userService.createUser(personalInfo, phoneNumber, user.preferedLocation)
+		let person = await this.userService.findByNationalID(nationalID)
+		if (!person) {
+			person = await this.userService.createUser(personalInfo, phoneNumber, user.preferedLocation)
+		}
 		const refCode = await this.otpService.generatedAndSentOTP(person._id, person.phoneNumber)
 		return { refCode, phoneNumber: person.phoneNumber }
 	}
