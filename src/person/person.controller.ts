@@ -14,6 +14,7 @@ import {
 import {
 	ApiBadRequestResponse,
 	ApiBearerAuth,
+	ApiConflictResponse,
 	ApiCreatedResponse,
 	ApiNotFoundResponse,
 	ApiOkResponse,
@@ -72,6 +73,7 @@ export class PersonController {
 	@ApiBadRequestResponse({ description: '5 Person limit is reached' })
 	@ApiBadRequestResponse({ description: 'Cannot add yourself' })
 	@ApiNotFoundResponse({ description: 'Not found in national external API' })
+	@ApiConflictResponse({ description: 'This user is already has this person' })
 	@ApiUnauthorizedResponse({ description: 'Missing or invalid JWT token' })
 	async newPersonCheck(
 		@User() user: UserDocument,
