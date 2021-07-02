@@ -86,10 +86,11 @@ export class PersonController {
 		// Check validity of nationalID and laserID
 		const personalInfo = await this.apiService.searchByNationalID(nationalID, laserID)
 		const person = await this.userService.findByNationalIDAndVerified(nationalID)
+
 		// Existing User
 		if (person) {
-			const isAlreadyAdd = await this.personService.isPersonOfUser(user._id, person._id)
-			if (isAlreadyAdd) throw new ConflictException('User already in the person')
+			const isAlreadyAdded = await this.personService.isPersonsOfUser(user._id, [person])
+			if (isAlreadyAdded) throw new ConflictException('User already in the person')
 			const refCode = await this.otpService.generatedAndSentOTP(person._id, person.phoneNumber)
 			return res.status(201).send({ refCode, phoneNumber: person.phoneNumber })
 		}
