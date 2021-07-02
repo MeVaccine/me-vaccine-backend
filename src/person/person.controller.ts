@@ -1,7 +1,20 @@
-import { BadRequestException, Body, Controller, Delete, Get, Param, Post, Query, Res, UseGuards } from '@nestjs/common'
+import {
+	BadRequestException,
+	Body,
+	ConflictException,
+	Controller,
+	Delete,
+	Get,
+	Param,
+	Post,
+	Query,
+	Res,
+	UseGuards,
+} from '@nestjs/common'
 import {
 	ApiBadRequestResponse,
 	ApiBearerAuth,
+	ApiConflictResponse,
 	ApiCreatedResponse,
 	ApiNotFoundResponse,
 	ApiOkResponse,
@@ -60,6 +73,7 @@ export class PersonController {
 	@ApiBadRequestResponse({ description: '5 Person limit is reached' })
 	@ApiBadRequestResponse({ description: 'Cannot add yourself' })
 	@ApiNotFoundResponse({ description: 'Not found in national external API' })
+	@ApiConflictResponse({ description: 'This user is already has this person' })
 	@ApiUnauthorizedResponse({ description: 'Missing or invalid JWT token' })
 	async newPersonCheck(
 		@User() user: UserDocument,
@@ -72,8 +86,11 @@ export class PersonController {
 		// Check validity of nationalID and laserID
 		const personalInfo = await this.apiService.searchByNationalID(nationalID, laserID)
 		const person = await this.userService.findByNationalIDAndVerified(nationalID)
+
 		// Existing User
 		if (person) {
+			const isAlreadyAdded = await this.personService.isPersonsOfUser(user._id, [person])
+			if (isAlreadyAdded) throw new ConflictException('User already in the person')
 			const refCode = await this.otpService.generatedAndSentOTP(person._id, person.phoneNumber)
 			return res.status(201).send({ refCode, phoneNumber: person.phoneNumber })
 		}
@@ -101,7 +118,10 @@ export class PersonController {
 		if (isExceeded) throw new BadRequestException('5 Person limit is reached')
 
 		const personalInfo = await this.apiService.searchByNationalID(nationalID, laserID)
-		const person = await this.userService.createUser(personalInfo, phoneNumber, user.preferedLocation)
+		let person = await this.userService.findByNationalID(nationalID)
+		if (!person) {
+			person = await this.userService.createUser(personalInfo, phoneNumber, user.preferedLocation)
+		}
 		const refCode = await this.otpService.generatedAndSentOTP(person._id, person.phoneNumber)
 		return { refCode, phoneNumber: person.phoneNumber }
 	}
