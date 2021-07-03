@@ -59,19 +59,7 @@ export class PersonService {
 	}
 
 	async isPersonOfUser(userId: string, personId: string): Promise<boolean> {
-		const user = await this.userModel.aggregate([
-			{
-				$match: {
-					_id: new ObjectId(userId),
-					persons: [new ObjectId(personId)],
-				},
-			},
-			{
-				$project: {
-					_id: 1,
-				},
-			},
-		])
-		return user.length !== 0
+		const person = await this.userService.findByID(personId)
+		return this.isPersonsOfUser(userId, [person])
 	}
 }
