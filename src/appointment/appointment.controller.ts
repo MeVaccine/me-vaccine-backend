@@ -20,6 +20,7 @@ import {
 	ApiTags,
 	ApiUnauthorizedResponse,
 	ApiBearerAuth,
+	ApiConflictResponse,
 } from '@nestjs/swagger'
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard'
 import { User } from 'src/decorators/user.decorator'
@@ -159,5 +160,17 @@ export class AppointmentController {
 			id: user._id,
 			appointment: nextAppointment,
 		}
+	}
+
+	@Get('eligible')
+	@UseGuards(JwtAuthGuard)
+	@ApiOperation({ description: 'Check if user can make new appointment' })
+	@ApiOkResponse()
+	@ApiConflictResponse({ description: 'User already make an appointment' })
+	@ApiUnauthorizedResponse({ description: 'JWT token is not present or querying user that not your person' })
+	async checkNewAppointmentEligible(@User() user: UserDocument, @Body() ids: string[]) {
+		const person = await Promise.all(ids.map(id => this.userService.findByID(id)))
+		const isPersonsOfUser = await this.personSerivce.isPersonsOfUser(user._id, person)
+		if (!isPersonsOfUser) throw new UnauthorizedException('Your are querying user that not your person')
 	}
 }
