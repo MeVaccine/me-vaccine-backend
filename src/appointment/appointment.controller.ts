@@ -20,12 +20,13 @@ import {
 	ApiTags,
 	ApiUnauthorizedResponse,
 	ApiBearerAuth,
+	ApiConflictResponse,
 } from '@nestjs/swagger'
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard'
 import { User } from 'src/decorators/user.decorator'
 import { LocationService } from 'src/location/location.service'
 import { PersonService } from 'src/person/person.service'
-import { Appointment } from 'src/schema/Appointment.schema'
+import { Appointment, AppointmentStatus } from 'src/schema/Appointment.schema'
 import { UserDocument } from 'src/schema/User.schema'
 import { Vaccine, VaccineDocument } from 'src/schema/Vaccine.schema'
 import { UserService } from 'src/user/user.service'
@@ -157,7 +158,24 @@ export class AppointmentController {
 		return {
 			...user.toObject(),
 			id: user._id,
+			preferedLocation: undefined,
 			appointment: nextAppointment,
+		}
+	}
+
+	@Get('eligible')
+	@UseGuards(JwtAuthGuard)
+	@ApiOperation({ description: 'Check if user can make new appointment' })
+	@ApiOkResponse()
+	@ApiUnauthorizedResponse({ description: 'JWT token is not present or querying user that not your person' })
+	async checkNewAppointmentEligible(@User() user: UserDocument) {
+		// const person = await Promise.all(ids.map(id => this.userService.findByID(id)))
+		// const isPersonsOfUser = await this.personSerivce.isPersonsOfUser(user._id, person)
+		// if (!isPersonsOfUser) throw new UnauthorizedException('Your are querying user that not your person')
+		return {
+			isEligible:
+				user.appointments.length == 0 ||
+				user.appointments.every(el => el.status != AppointmentStatus.APPOINTED),
 		}
 	}
 }

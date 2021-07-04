@@ -53,7 +53,10 @@ export class LocationService {
 
 	async getEarliestAvaliableDateTime(locationId: string) {
 		const location = await this.locationModel.findById(locationId, 'dateTime').lean().exec()
-		const earliestDateTime = location.dateTime.find(el => el.avaliable !== 0)
+		const now = dayjs.utc().utcOffset(7).hour(0)
+		const earliestDateTime = location.dateTime.find(
+			el => el.avaliable !== 0 && dayjs(el.startDateTime).isAfter(now)
+		)
 		if (!earliestDateTime) return []
 		const dateTime = location.dateTime.filter(el =>
 			dayjs(el.startDateTime).isSame(dayjs(earliestDateTime.startDateTime), 'days')
@@ -121,6 +124,15 @@ export class LocationService {
 	}
 
 	async isValidForAppointment(data: NewAppointmentDto, neededVaccine: Record<string, number>) {
+		const now = dayjs.utc().utcOffset(7)
+		if (dayjs(data.dateTime).isBefore(now)) {
+			throw new BadRequestException(
+				new NewAppointmentExceptionDto(
+					`Your selected date and time is in the past`,
+					'ขออภัย วันและเวลาที่คุณเลือกไม่สามารถจองได้แล้ว'
+				)
+			)
+		}
 		const location = await this.locationModel
 			.findOne(
 				{
@@ -142,7 +154,7 @@ export class LocationService {
 			throw new BadRequestException(
 				new NewAppointmentExceptionDto(
 					`Your selected date and time is not avaliable for ${data.person.length} person`,
-					'ขออภัย วันและเวลาที่คุณเลือก คิดไม่ออก'
+					`ขออภัย วันและเวลาที่คุณเลือกไม่สามารถจองได้สำหรับ ${data.person.length} ท่าน`
 				)
 			)
 
