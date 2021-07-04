@@ -34,8 +34,11 @@ export class SymptomService {
 		if (history.length === 0) return
 		const now = dayjs.utc().utcOffset(7).startOf('day')
 		const historyDate = dayjs(history[history.length - 1].timestamp).startOf('day')
+		console.log(historyDate.diff(now, 'day'), Math.abs(historyDate.diff(now, 'day')) >= 1)
 		const isLongerThanDay = Math.abs(historyDate.diff(now, 'day')) >= 1
-		if (!isLongerThanDay) throw new ConflictException()
+		if (!isLongerThanDay) {
+			throw new ConflictException()
+		}
 	}
 
 	async createNewSymptomForm(userId: string, formData: NewSymptomAssessmentFormDto) {
