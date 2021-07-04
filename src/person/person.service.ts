@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { ObjectId, ObjectID } from 'mongodb'
 import { LeanDocument, Model } from 'mongoose'
+import { AppointmentStatus } from 'src/schema/Appointment.schema'
 import { User, UserDocument } from 'src/schema/User.schema'
 import { UserService } from 'src/user/user.service'
 
@@ -17,7 +18,7 @@ export class PersonService {
 
 	async findAllPerson(userId: string) {
 		const user = await this.userModel
-			.findById(userId, 'persons')
+			.findById(userId, { persons: true })
 			.populate('persons', [
 				'_id',
 				'prefix_en',
@@ -28,9 +29,19 @@ export class PersonService {
 				'firstname_th',
 				'lastname_th',
 				'gender_th',
+				'appointments',
 			])
+			.lean()
 			.exec()
-		return user.persons
+
+		return user.persons.map(person => {
+			return {
+				...person,
+				isEligible:
+					person.appointments.length == 0 ||
+					person.appointments.every(el => el.status == AppointmentStatus.VACCINATED),
+			}
+		})
 	}
 
 	async countPerson(userId: ObjectId): Promise<number> {
