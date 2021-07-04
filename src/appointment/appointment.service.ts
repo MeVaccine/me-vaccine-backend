@@ -47,13 +47,17 @@ export class AppointmentService {
 		const appointments = await this.getAllAppointment(userId)
 		if (appointments.length === 0) return {}
 
-		let nextAppointment = appointments[0]
+		let nextAppointment
 		const now = dayjs.utc().utcOffset(7)
 		let minDatediff = 200000000
 
 		for (const appointment of appointments) {
 			const dateDiff = dayjs(appointment.dateTime).diff(now, 'day')
-			if (appointment.status === AppointmentStatus.APPOINTED && dateDiff <= minDatediff) {
+			if (
+				appointment.status === AppointmentStatus.APPOINTED &&
+				dayjs(appointment.dateTime).isAfter(now) &&
+				dateDiff <= minDatediff
+			) {
 				minDatediff = dateDiff
 				nextAppointment = appointment
 			}
