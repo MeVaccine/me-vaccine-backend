@@ -53,7 +53,10 @@ export class LocationService {
 
 	async getEarliestAvaliableDateTime(locationId: string) {
 		const location = await this.locationModel.findById(locationId, 'dateTime').lean().exec()
-		const earliestDateTime = location.dateTime.find(el => el.avaliable !== 0)
+		const now = dayjs.utc().utcOffset(7).hour(0)
+		const earliestDateTime = location.dateTime.find(
+			el => el.avaliable !== 0 && dayjs(el.startDateTime).isAfter(now)
+		)
 		if (!earliestDateTime) return []
 		const dateTime = location.dateTime.filter(el =>
 			dayjs(el.startDateTime).isSame(dayjs(earliestDateTime.startDateTime), 'days')
