@@ -37,6 +37,7 @@ export class PersonService {
 		return user.persons.map(person => {
 			return {
 				...person,
+				appointments: undefined,
 				isEligible:
 					person.appointments.length == 0 ||
 					person.appointments.every(el => el.status == AppointmentStatus.VACCINATED),

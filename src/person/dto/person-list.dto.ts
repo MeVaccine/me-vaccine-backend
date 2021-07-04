@@ -19,4 +19,6 @@ export class PersonListDto {
 	lastname_th: string
 	@ApiProperty()
 	gender_th: string
+	@ApiProperty()
+	isEligible: boolean
 }
