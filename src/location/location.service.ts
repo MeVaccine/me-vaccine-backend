@@ -124,6 +124,15 @@ export class LocationService {
 	}
 
 	async isValidForAppointment(data: NewAppointmentDto, neededVaccine: Record<string, number>) {
+		const now = dayjs.utc().utcOffset(7)
+		if (dayjs(data.dateTime).isBefore(now)) {
+			throw new BadRequestException(
+				new NewAppointmentExceptionDto(
+					`Your selected date and time is in the past`,
+					'ขออภัย วันและเวลาที่คุณเลือกไม่สามารถจองได้แล้ว'
+				)
+			)
+		}
 		const location = await this.locationModel
 			.findOne(
 				{
@@ -145,7 +154,7 @@ export class LocationService {
 			throw new BadRequestException(
 				new NewAppointmentExceptionDto(
 					`Your selected date and time is not avaliable for ${data.person.length} person`,
-					'ขออภัย วันและเวลาที่คุณเลือก คิดไม่ออก'
+					`ขออภัย วันและเวลาที่คุณเลือกไม่สามารถจองได้สำหรับ ${data.person.length} ท่าน`
 				)
 			)
 
