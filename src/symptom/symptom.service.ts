@@ -15,8 +15,8 @@ export class SymptomService {
 
 	isLatestAppointmentEligible(latestAppointment: LeanDocument<Appointment>) {
 		if (!latestAppointment) throw new ConflictException()
-		const now = dayjs.utc().utcOffset(7)
-		const isLongerThanWeek = dayjs(latestAppointment.dateTime).diff(now, 'week') >= 1
+		const now = dayjs.utc()
+		const isLongerThanWeek = dayjs.utc(latestAppointment.dateTime).diff(now, 'week') >= 1
 		if (isLongerThanWeek) throw new ConflictException()
 		return {
 			...latestAppointment,
@@ -32,8 +32,8 @@ export class SymptomService {
 	async isLatestAssessmentFormEligible(userId: string) {
 		const history = await this.getSymptomAssessmentHistory(userId)
 		if (history.length === 0) return
-		const now = dayjs.utc().utcOffset(7).startOf('day')
-		const historyDate = dayjs(history[history.length - 1].timestamp).startOf('day')
+		const now = dayjs.utc().startOf('day')
+		const historyDate = dayjs.utc(history[history.length - 1].timestamp).startOf('day')
 		console.log(historyDate.diff(now, 'day'), Math.abs(historyDate.diff(now, 'day')) >= 1)
 		const isLongerThanDay = Math.abs(historyDate.diff(now, 'day')) >= 1
 		if (!isLongerThanDay) {
