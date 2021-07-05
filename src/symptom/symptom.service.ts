@@ -48,6 +48,7 @@ export class SymptomService {
 		symptomForm.nausea = formData.nausea
 		symptomForm.others = formData.others
 		symptomForm.tiredness = formData.tiredness
+		symptomForm.timestamp = dayjs.utc().toDate()
 		user.symptomForms.push(symptomForm)
 		return user.save()
 	}
