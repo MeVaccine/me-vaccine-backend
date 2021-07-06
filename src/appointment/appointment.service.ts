@@ -36,9 +36,14 @@ export class AppointmentService {
 			.lean()
 			.exec()
 		if (!user.appointments) return []
+		const now = dayjs.utc().utcOffset(7)
 		const appointments = user.appointments.map(el => ({
 			...el,
 			dateTime: dayjs(el.dateTime).utcOffset(7).format(),
+			status:
+				dayjs(el.dateTime).utcOffset(7).isBefore(now) && el.status == AppointmentStatus.APPOINTED
+					? AppointmentStatus.CANCELED
+					: el.status,
 		}))
 		return appointments
 	}
