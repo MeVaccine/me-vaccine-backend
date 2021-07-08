@@ -25,9 +25,10 @@ export class ExternalController {
 	@ApiCreatedResponse({ type: AppointmentQueryResponse })
 	@ApiCreatedResponse()
 	@ApiBadRequestResponse({ type: NewAppointmentExceptionDto })
-	async vaccinateUser(@Body() { userId, dateTime }: VaccinateUserDto) {
+	async vaccinateUser(@Body() { id, dateTime }: VaccinateUserDto) {
+		const user = await this.userSerivce.findByNationalID(id)
+		const userId = user._id
 		const appointment = await this.appointmentService.getLatestAppointedAppointment(userId, dateTime)
-		const user = await this.userSerivce.findByID(userId)
 
 		await this.appointmentService.updateAppointmentStatus(
 			userId,
